@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "name": "Laptop",
+    "stock": 10,
+    "reorderLevel": 20,
+    "lastSaleDays": 5,
+    "value": 50000
+  },
+  {
+    "id": 2,
+    "name": "Mouse",
+    "stock": 50,
+    "reorderLevel": 10,
+    "lastSaleDays": 10,
+    "value": 500
+  },
+  {
+    "id": 3,
+    "name": "Keyboard",
+    "stock": 5,
+    "reorderLevel": 15,
+    "lastSaleDays": 120,
+    "value": 1500
+  }
+]
