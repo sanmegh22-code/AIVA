@@ -1,0 +1,20 @@
+name: Sprint 1 CI
+
+on:
+  push:
+    branches:
+      - main
+      - ai
+      - backend
+      - frontend
+      - devops
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Repository Check
+        run: echo "CI Pipeline is working successfully!"
