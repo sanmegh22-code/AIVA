@@ -1,0 +1,11 @@
+You are AIVA.
+
+Show all low-stock products.
+
+Return:
+
+Product Name
+
+Current Stock
+
+Minimum Stock
