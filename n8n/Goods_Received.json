@@ -1,0 +1,163 @@
+{
+  "name": "Goods_Received",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "df820e69-f076-4234-8d6a-154dacfbabe9",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "07fd8212-cb39-42ff-86fa-de2d78f0dd05",
+              "name": "PO Number",
+              "value": "PO-1001",
+              "type": "string"
+            },
+            {
+              "id": "f306f852-2825-4495-bfd5-c6678ab5d353",
+              "name": "Product",
+              "value": "Laptop",
+              "type": "string"
+            },
+            {
+              "id": "30f6357c-3546-4235-8aad-18bd6e90f553",
+              "name": "Quantity",
+              "value": 20,
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "362f97bc-cc4e-450c-b6da-a2ff9e09fd58",
+      "name": "PO Received"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0f0f02c4-57d1-47ab-a392-93a3ddad8a24",
+              "name": "Inventory Updated",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "bf5c8738-27fa-42a1-9588-615999e6b0d0",
+              "name": "Product",
+              "value": "Laptop",
+              "type": "string"
+            },
+            {
+              "id": "e8751b33-dab1-45d1-82a3-815b5cabff2f",
+              "name": "New Stock",
+              "value": 120,
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        448,
+        0
+      ],
+      "id": "e10701b0-d45e-4f79-b540-937b8649fb60",
+      "name": "Update Inventory"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b5c624e2-ef5d-4ecb-88a2-f28ccb8c48d4",
+              "name": "Manager",
+              "value": "Inventory Manager",
+              "type": "string"
+            },
+            {
+              "id": "82dcb9fb-251a-44b1-ab81-99b72ea26e7d",
+              "name": "Message",
+              "value": "Inventory updated successfully",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        656,
+        0
+      ],
+      "id": "0e1e1489-cbfe-4b87-8ba9-68115f971ae0",
+      "name": "Notify Inventory Manager"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "PO Received",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PO Received": {
+      "main": [
+        [
+          {
+            "node": "Update Inventory",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Inventory": {
+      "main": [
+        [
+          {
+            "node": "Notify Inventory Manager",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "8610fb37-b64b-4bed-8239-ff36ccad5379",
+  "meta": {
+    "instanceId": "2ab704fce2ecc3bb369ca4dbaa54887363cdf898fee84d184fb5ab172327f123"
+  },
+  "nodeGroups": [],
+  "id": "jFxY8Q9c4ABJpZ4m",
+  "tags": []
+}

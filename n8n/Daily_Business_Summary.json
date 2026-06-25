@@ -1,0 +1,172 @@
+{
+  "name": "Daily_Business_Summary",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "44402804-44e2-4a61-814e-93fbde6906d3",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a149938c-2f95-4aad-aacb-c9d7236a1ecf",
+              "name": "totalSales",
+              "value": 250000,
+              "type": "number"
+            },
+            {
+              "id": "8e7f6a56-18ac-4445-8c7f-b7055fb84b2b",
+              "name": "totalPurchases",
+              "value": 180000,
+              "type": "number"
+            },
+            {
+              "id": "789e28c8-e0f8-43a5-b82c-aab580fc2a4f",
+              "name": "pendingOrders",
+              "value": "12",
+              "type": "string"
+            },
+            {
+              "id": "09ace2f2-2345-47de-ba64-b3e67a9b11fe",
+              "name": "newCustomers",
+              "value": "8",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "f2496b95-a550-436b-89b6-eaed31f63195",
+      "name": "Sales + Purchases"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "31bc3ad7-ee9e-450c-b28a-1301580c91bc",
+              "name": "summary",
+              "value": "Daily Business Summary  Sales: ₹250000  Purchases: ₹180000  Pending Orders: 12  New Customers: 8",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        416,
+        0
+      ],
+      "id": "217de8b4-0973-4b0e-9304-cdce5b9e5371",
+      "name": "Generate Summary"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1fa4e074-6e34-4cf1-b217-71237b95cb13",
+              "name": "to",
+              "value": "admin@company.com",
+              "type": "string"
+            },
+            {
+              "id": "b21ea21a-c699-4188-ba15-414c517eea13",
+              "name": "subject",
+              "value": "Daily Business Summary",
+              "type": "string"
+            },
+            {
+              "id": "f832567b-d530-403d-af49-af18d1fe1db9",
+              "name": "message",
+              "value": "={{$json.summary}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        624,
+        0
+      ],
+      "id": "83402e8e-03fc-4661-93a6-a726db888b57",
+      "name": "Send Email"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Sales + Purchases",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sales + Purchases": {
+      "main": [
+        [
+          {
+            "node": "Generate Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Summary": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "32185c16-ebe2-4cb1-a584-12d38c97d21a",
+  "meta": {
+    "instanceId": "2ab704fce2ecc3bb369ca4dbaa54887363cdf898fee84d184fb5ab172327f123"
+  },
+  "nodeGroups": [],
+  "id": "9QZDa0EHNTjolNea",
+  "tags": []
+}
