@@ -1,0 +1,174 @@
+{
+  "name": "AIVA Inventory Assistant",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "dde51c6c-73a8-45e9-b969-11c4d0848ca2",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e8b1c12c-3126-43f0-b7e1-f723ac94c072",
+              "name": "question",
+              "value": "show low stock items",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "1f502530-aa85-4b99-9f07-7e1658ebadec",
+      "name": "User Question"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "fa40e940-11da-4b2a-8cd1-b05b09d7f3bd",
+              "leftValue": "={{$json.question}}",
+              "rightValue": " low stock ",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        416,
+        0
+      ],
+      "id": "b25568b8-9b77-44b4-b49e-156be7766eef",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6a310357-c45f-4421-ba01-668990169821",
+              "name": "response",
+              "value": "5 products are below reorder level.  1. Keyboard 2. Mouse 3. Monitor 4. Printer 5. Webcam",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        624,
+        -96
+      ],
+      "id": "cf71343f-04fa-4760-be42-c9cd8fdcedc0",
+      "name": "AIVA Response"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a30ffab4-6b7c-4167-99b5-f00f43b20653",
+              "name": "response",
+              "value": "Sorry, I can only answer: • Show low stock items • Show inventory summary • Show dead stock",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        624,
+        96
+      ],
+      "id": "39d8920d-6c1b-49f3-b552-0c5773a0577b",
+      "name": "Unknown Question"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "User Question",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "User Question": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "AIVA Response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unknown Question",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "016bc3b9-5d3b-4165-a2b8-17724de554d6",
+  "meta": {
+    "instanceId": "2ab704fce2ecc3bb369ca4dbaa54887363cdf898fee84d184fb5ab172327f123"
+  },
+  "nodeGroups": [],
+  "id": "IBIq2PEU1IFDIWfQ",
+  "tags": []
+}
