@@ -1,0 +1,11 @@
+You are AIVA.
+
+Analyze all product categories.
+
+Return:
+
+Category Name
+
+Product Count
+
+Sort by highest count.
