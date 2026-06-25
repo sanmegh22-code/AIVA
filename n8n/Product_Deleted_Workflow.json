@@ -1,0 +1,134 @@
+{
+  "name": "Product_Deleted_Workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "55766268-3342-40df-801c-7610aab20751",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c11314aa-12fe-4f56-aecb-5d1c4f731bcc",
+              "name": "product",
+              "value": "Laptop",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "ff99d40e-990b-45e6-8723-f7dc09bf8761",
+      "name": "Delete Request"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "646e340f-28a5-4175-82ea-1b40b70836eb",
+              "name": "archive",
+              "value": "Product archived successfully",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        416,
+        0
+      ],
+      "id": "088ed85a-39a6-41c3-be9c-b12d71a2e6c1",
+      "name": "Archive Product Data"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2cb00d22-f136-42e8-8ee0-6a56cf479b02",
+              "name": "event",
+              "value": "Delete operation recorded",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        624,
+        0
+      ],
+      "id": "62285fee-702b-497c-bc28-fd51af2bd455",
+      "name": "Log Event"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Delete Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete Request": {
+      "main": [
+        [
+          {
+            "node": "Archive Product Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Archive Product Data": {
+      "main": [
+        [
+          {
+            "node": "Log Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "006d4d69-e774-4cef-be8f-dce9f3a89956",
+  "meta": {
+    "instanceId": "2ab704fce2ecc3bb369ca4dbaa54887363cdf898fee84d184fb5ab172327f123"
+  },
+  "nodeGroups": [],
+  "id": "vslWl6lddFliGf2c",
+  "tags": []
+}

@@ -1,0 +1,134 @@
+{
+  "name": "Product_Created_Wokflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "30233923-4baa-4620-9ffb-a8d9464770e5",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1eeead78-90fc-4a08-9dee-620b8a44185b",
+              "name": "productName",
+              "value": "Laptop",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "dfcb50ae-5cca-46c9-ba40-85329b1fbf6c",
+      "name": "Product Added"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "261fd2ed-de26-48db-bcd2-eaed51a85c77",
+              "name": "log",
+              "value": "Product Laptop Created Successfully",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        400,
+        0
+      ],
+      "id": "e125ccfb-5c99-4d24-8e5e-c003ea69a40f",
+      "name": "Create Audit Log"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b163a090-9448-4566-8dfc-587364afdeee",
+              "name": "notifications",
+              "value": "Admin notified successfully",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        608,
+        0
+      ],
+      "id": "b27a5007-2630-42df-b758-29925759fc05",
+      "name": "Notify Admin"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Product Added",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Product Added": {
+      "main": [
+        [
+          {
+            "node": "Create Audit Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Audit Log": {
+      "main": [
+        [
+          {
+            "node": "Notify Admin",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "07e4ff0b-a02d-4722-9cfa-df69c63aed3b",
+  "meta": {
+    "instanceId": "2ab704fce2ecc3bb369ca4dbaa54887363cdf898fee84d184fb5ab172327f123"
+  },
+  "nodeGroups": [],
+  "id": "wd2OweM3qxeKO1dg",
+  "tags": []
+}
