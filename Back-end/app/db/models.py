@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, Float
+from sqlalchemy import Column, Float, Integer, String
+
 from .database import Base
 
 
@@ -9,7 +10,15 @@ class User(Base):
     name = Column(String, nullable=False)
     email = Column(String, unique=True, nullable=False)
     hashed_password = Column(String, nullable=False)
-    role = Column(String, default="user")
+    role = Column(String, default="staff")
+
+
+class Category(Base):
+    __tablename__ = "categories"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, unique=True, nullable=False)
+    description = Column(String, nullable=True)
 
 
 class Product(Base):
@@ -26,3 +35,5 @@ class Product(Base):
     price = Column(Float, default=0)
 
     category = Column(String, default="General")
+
+    image_url = Column(String, nullable=True)

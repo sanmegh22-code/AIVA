@@ -1,46 +1,50 @@
-from passlib.context import CryptContext
-from jose import jwt
 from datetime import datetime, timedelta
-import os
-from dotenv import load_dotenv
-from jose import jwt, JWTError
+
 from fastapi import HTTPException
-load_dotenv()
+from jose import JWTError, jwt
+from passlib.context import CryptContext
+
+from app.core.config import settings
 
 pwd_context = CryptContext(
     schemes=["bcrypt"],
     deprecated="auto"
 )
 
-SECRET_KEY = os.getenv("SECRET_KEY")
-ALGORITHM = os.getenv("ALGORITHM")
 
 def hash_password(password: str):
     return pwd_context.hash(password)
 
-def verify_password(password, hashed_password):
+
+def verify_password(password: str, hashed_password: str):
     return pwd_context.verify(
         password,
         hashed_password
     )
 
-def create_access_token(data: dict):
-    expire = datetime.utcnow() + timedelta(minutes=60)
 
-    data.update({"exp": expire})
+def create_access_token(data: dict):
+    to_encode = data.copy()
+
+    expire = datetime.utcnow() + timedelta(
+        minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
+    )
+
+    to_encode.update({"exp": expire})
 
     return jwt.encode(
-        data,
-        SECRET_KEY,
-        algorithm=ALGORITHM
+        to_encode,
+        settings.SECRET_KEY,
+        algorithm=settings.ALGORITHM
     )
-def verify_token(token: str):
 
+
+def verify_token(token: str):
     try:
         payload = jwt.decode(
             token,
-            SECRET_KEY,
-            algorithms=[ALGORITHM]
+            settings.SECRET_KEY,
+            algorithms=[settings.ALGORITHM]
         )
 
         email = payload.get("sub")
