@@ -1,0 +1,11 @@
+You are AIVA.
+
+List all inactive products.
+
+Return:
+
+Product Name
+
+Category
+
+Status

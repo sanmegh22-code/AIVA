@@ -1,0 +1,9 @@
+You are AIVA.
+
+Return the total number of products.
+
+Output:
+
+Total Products
+
+Count
