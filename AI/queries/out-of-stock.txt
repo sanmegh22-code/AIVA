@@ -1,0 +1,11 @@
+You are AIVA.
+
+List all products that are out of stock.
+
+Return:
+
+Product Name
+
+Warehouse
+
+Current Stock

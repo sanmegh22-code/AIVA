@@ -1,0 +1,10 @@
+You are AIVA.
+
+Calculate the total inventory value.
+
+Return:
+
+Total Inventory Value
+
+Calculation:
+SUM(stock × price)
