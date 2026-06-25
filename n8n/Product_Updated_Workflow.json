@@ -1,0 +1,100 @@
+{
+  "name": "Product_Updated_Workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "1f218633-ceeb-41e1-b816-0084b8724173",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c55f4dfd-0f30-472b-a29e-62dfb9f3eb4e",
+              "name": "product",
+              "value": "Laptop",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "d07cd308-2cf5-4d3b-8a25-8e37be34fae8",
+      "name": "Product Updated"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ae29617a-2aa7-472b-b1fc-c96f7047993f",
+              "name": "history",
+              "value": "Stock updated from 20 to 30",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        416,
+        0
+      ],
+      "id": "61ce4e90-5f40-4eaa-adbc-84eaaae6c4c3",
+      "name": "Record Change History"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Product Updated",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Product Updated": {
+      "main": [
+        [
+          {
+            "node": "Record Change History",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "e251b07f-f2ff-4b97-a4a1-92f154555af6",
+  "meta": {
+    "instanceId": "2ab704fce2ecc3bb369ca4dbaa54887363cdf898fee84d184fb5ab172327f123"
+  },
+  "nodeGroups": [],
+  "id": "5BoiHpqETKrfAgPd",
+  "tags": []
+}
