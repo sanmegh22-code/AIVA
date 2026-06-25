@@ -1,0 +1,169 @@
+{
+  "name": "Sales_Order_Created",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "c74bf8f8-c104-45ed-8ae8-caeb4a4ae683",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1a7c9d62-9593-48bd-bea7-25e583d7be1b",
+              "name": "Order ID",
+              "value": "SO-1005",
+              "type": "string"
+            },
+            {
+              "id": "a83d546f-3952-4e88-8192-2c16e41407fe",
+              "name": "Customer",
+              "value": "John Doe",
+              "type": "string"
+            },
+            {
+              "id": "98cbc09f-d5ed-4c97-a6c0-f9d2d6588644",
+              "name": "Product",
+              "value": "Laptop",
+              "type": "string"
+            },
+            {
+              "id": "f2258a05-628e-49f5-be66-658bdfb97737",
+              "name": "Quantity",
+              "value": 2,
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "a512e1d7-0e71-4ffa-9ccb-3be47b181b13",
+      "name": "Sales Order"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "49221db2-d85d-47ed-b078-36990d969280",
+              "name": "To",
+              "value": "john@example.com",
+              "type": "string"
+            },
+            {
+              "id": "cddacbcb-3447-438f-9076-83aa741c02d6",
+              "name": "Subject",
+              "value": "Order Confirmation",
+              "type": "string"
+            },
+            {
+              "id": "bb4c3982-a233-455a-9793-c5935bb564f3",
+              "name": "Message",
+              "value": "Thank you for your purchase.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        416,
+        0
+      ],
+      "id": "9b8a6481-f0d1-4551-ba7d-e0cfe35f56dc",
+      "name": "Confirmation Email"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "51bfded7-f550-4a2a-8f5b-3bcd57cd7a67",
+              "name": "Department",
+              "value": "Sales Team",
+              "type": "string"
+            },
+            {
+              "id": "2476a64b-bc09-4dc7-b35e-40f37f292da0",
+              "name": "Message",
+              "value": "New sales order created.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        624,
+        0
+      ],
+      "id": "1b3c1d0b-fd39-4214-81a0-7ee61e6cafe8",
+      "name": "Internal Notification"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Sales Order",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sales Order": {
+      "main": [
+        [
+          {
+            "node": "Confirmation Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Confirmation Email": {
+      "main": [
+        [
+          {
+            "node": "Internal Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "6c2e07d7-1037-400a-af62-dd89e0c3a3f2",
+  "meta": {
+    "instanceId": "2ab704fce2ecc3bb369ca4dbaa54887363cdf898fee84d184fb5ab172327f123"
+  },
+  "nodeGroups": [],
+  "id": "s3qHBvQtzSc6aOTV",
+  "tags": []
+}

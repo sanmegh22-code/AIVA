@@ -1,0 +1,169 @@
+{
+  "name": "Purchase_Order_Approval",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "58a6804f-eaf0-447d-b571-6c8b9c185396",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "067ed2d8-a4dd-4616-bd27-92bfa2a10168",
+              "name": "poNumber",
+              "value": "PO-1001",
+              "type": "string"
+            },
+            {
+              "id": "f7eb3a1e-f90d-496e-a0be-ef6a7595aebc",
+              "name": "supplier",
+              "value": "ABC Suppliers",
+              "type": "string"
+            },
+            {
+              "id": "e4ce4169-3db0-4884-b6a7-d0a556e96666",
+              "name": "status",
+              "value": "Approved",
+              "type": "string"
+            },
+            {
+              "id": "1354b1ef-1ec1-4958-b638-6832e20b967b",
+              "name": "amount",
+              "value": 50000,
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "3f1952df-6d0f-4390-a0a6-7f6d92514afd",
+      "name": "PO Approved"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cb13e387-d028-48ce-9e2e-b09b15d95ad4",
+              "name": "to",
+              "value": "supplier@example.com",
+              "type": "string"
+            },
+            {
+              "id": "e8413803-005b-48e3-aa87-6f8cf0802d4c",
+              "name": "subject",
+              "value": "Purchase Order Approved",
+              "type": "string"
+            },
+            {
+              "id": "0070b668-3d5e-492d-a000-f84ce416814f",
+              "name": "message",
+              "value": "Your Purchace Order PO-1001 has been approved",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        416,
+        0
+      ],
+      "id": "a0c72c88-706c-4029-b6ba-1012bf94eba8",
+      "name": "Email Supplier"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "959febf3-d098-4635-a361-b623fa95ba6c",
+              "name": "department",
+              "value": "Procurement",
+              "type": "string"
+            },
+            {
+              "id": "52c0ff49-61e3-45ac-ae5c-5e59bcb122c2",
+              "name": "notification",
+              "value": "Purchase Order Approved Successfully",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        624,
+        0
+      ],
+      "id": "9efb1f22-22bd-4dfb-93ca-d9c0d4f6f6c1",
+      "name": "Notify Team"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "PO Approved",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PO Approved": {
+      "main": [
+        [
+          {
+            "node": "Email Supplier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Supplier": {
+      "main": [
+        [
+          {
+            "node": "Notify Team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "0f14e973-4894-4e69-b195-103ab8633719",
+  "meta": {
+    "instanceId": "2ab704fce2ecc3bb369ca4dbaa54887363cdf898fee84d184fb5ab172327f123"
+  },
+  "nodeGroups": [],
+  "id": "gn1PZJoydkTa0hbP",
+  "tags": []
+}
