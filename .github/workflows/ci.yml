@@ -5,16 +5,23 @@ on:
     branches:
       - main
       - ai
-      - backend
-      - frontend
       - devops
+      - frontend
+      - backend
+
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  check:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-      - name: Repository Check
-        run: echo "CI Pipeline is working successfully!"
+      - name: Verify Repository
+        run: |
+          echo "CI Pipeline is working!"
+          ls -la
