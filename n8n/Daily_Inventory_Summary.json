@@ -1,0 +1,172 @@
+{
+  "name": "Daily_Inventory_Summary",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "2501eb7e-1a48-4cd3-9038-7d9f3fed6bbd",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1ae35d40-b3d2-45be-93f8-9c9e684615e2",
+              "name": "totalProducts",
+              "value": 250,
+              "type": "number"
+            },
+            {
+              "id": "c6aa2469-4dc7-4e84-8e8b-9d8af14901ec",
+              "name": "lowStock",
+              "value": 12,
+              "type": "number"
+            },
+            {
+              "id": "a920e885-013c-4ba1-bcb2-56bb78f7086c",
+              "name": "outOfStock",
+              "value": 5,
+              "type": "number"
+            },
+            {
+              "id": "842c55f3-6521-44c4-8c06-5067719565bc",
+              "name": "inventorValue",
+              "value": 1250000,
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "140e6ffb-2e57-4be1-82d1-da33555fe8e5",
+      "name": "Fetch Inventory"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f61e9d52-e553-4151-9bee-bff808136ef0",
+              "name": "summary",
+              "value": "Daily Inventory Summary  Total Products: 250 Low Stock Items: 12 Out Of Stock: 5 Inventory Value: ₹12,50,000",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        448,
+        0
+      ],
+      "id": "94f6b66b-0d16-49ce-b014-f60612a0bde2",
+      "name": "Generate Summary"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c5f12973-ee75-4c03-b6d0-d7fd2bef1526",
+              "name": "to ",
+              "value": "tejas@aiva.local",
+              "type": "string"
+            },
+            {
+              "id": "b08dd27c-17a8-4430-bcea-83fcbeae4b3b",
+              "name": "subject",
+              "value": "Daily Inventory Summary",
+              "type": "string"
+            },
+            {
+              "id": "09eb8b51-71fb-417a-b425-bd52f1364ef9",
+              "name": "message",
+              "value": "={{ $json.summary }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        656,
+        0
+      ],
+      "id": "ad8b2843-f2bd-4212-b96d-276d8da8e6cd",
+      "name": "Send Email"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetch Inventory",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Inventory": {
+      "main": [
+        [
+          {
+            "node": "Generate Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Summary": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "894393a8-e292-4a50-accb-e59759f47bc2",
+  "meta": {
+    "instanceId": "2ab704fce2ecc3bb369ca4dbaa54887363cdf898fee84d184fb5ab172327f123"
+  },
+  "nodeGroups": [],
+  "id": "pwgdZQGiQWUT0GUS",
+  "tags": []
+}

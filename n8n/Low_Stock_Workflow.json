@@ -1,0 +1,215 @@
+{
+  "name": "Low_Stock_Workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "b316c32f-bf55-4d36-bc3d-3336ec1f632f",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5f4b7da9-ed23-46b5-8a78-eeb797fada92",
+              "name": "product",
+              "value": "Laptop",
+              "type": "string"
+            },
+            {
+              "id": "a4774b28-0158-4ea9-88c3-f5a2ca826628",
+              "name": "stock",
+              "value": "5",
+              "type": "string"
+            },
+            {
+              "id": "4f84d442-e385-4d3d-8b93-0d6864496c10",
+              "name": "minimum",
+              "value": "10",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "5605a8b2-ed1f-4d10-8fd8-d6985b61a85e",
+      "name": "Inventory Updated"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "d16288df-b80e-4b90-a220-9e3e5dec03a2",
+              "leftValue": "={{$json.stock}}",
+              "rightValue": "={{$json.minimum}}",
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        416,
+        0
+      ],
+      "id": "877128d2-2161-401f-ab3c-045e55163833",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "17de3876-52dd-40f1-ad4f-334df8331ceb",
+              "name": "to",
+              "value": "warehouse@aiva.com",
+              "type": "string"
+            },
+            {
+              "id": "e4e494b9-dc78-4ca1-af77-4d66df5af75d",
+              "name": "subject",
+              "value": "Low Stock Alert",
+              "type": "string"
+            },
+            {
+              "id": "49c6db19-cf22-423c-8ab0-6e99f84590e1",
+              "name": "message",
+              "value": "Laptop stock is below minimum level",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        624,
+        -96
+      ],
+      "id": "2d27cc9d-61ee-4604-9aa4-c3b383439b0b",
+      "name": "Send Email Notification"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2ba2066d-bd79-4b69-8cba-d77855516e4e",
+              "name": "task",
+              "value": "Restock Laptop",
+              "type": "string"
+            },
+            {
+              "id": "7e3a1958-9ce5-44e2-86ac-aea425cfb99a",
+              "name": "priority",
+              "value": "High",
+              "type": "string"
+            },
+            {
+              "id": "9ea4c8a0-2b25-488d-a7d5-c69517c00550",
+              "name": "assignedTo",
+              "value": "Warehouse Manager",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        832,
+        -96
+      ],
+      "id": "60ddd4c7-e157-4134-9ec4-f392b0c1005a",
+      "name": "Create Task"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Inventory Updated",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Inventory Updated": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send Email Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email Notification": {
+      "main": [
+        [
+          {
+            "node": "Create Task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "40dcf6e3-6ef6-4484-915d-f44cb76922e3",
+  "meta": {
+    "instanceId": "2ab704fce2ecc3bb369ca4dbaa54887363cdf898fee84d184fb5ab172327f123"
+  },
+  "nodeGroups": [],
+  "id": "7xYKm1x8iwZzl11j",
+  "tags": []
+}

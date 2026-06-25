@@ -1,0 +1,123 @@
+{
+  "name": "Stock_Transfer_Workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "e6b8395a-bdc2-4090-ab2d-e9e70eae4709",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "52e9df58-f476-4857-82ef-4810b2eef1ea",
+              "name": "product",
+              "value": "Keyboard",
+              "type": "string"
+            },
+            {
+              "id": "5d3dfaf3-3b7b-40e8-87a8-4ba5fa85ede9",
+              "name": "quantity",
+              "value": "50",
+              "type": "string"
+            },
+            {
+              "id": "a51cef85-a91b-4861-94ee-3ea845080b7b",
+              "name": "from",
+              "value": "Warehouse A",
+              "type": "string"
+            },
+            {
+              "id": "7d73da12-3781-478b-b0f4-ffd7b7b7a291",
+              "name": "to ",
+              "value": "Warehouse B",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "570ff40f-1b9c-435c-b5bc-8a7d21507a7c",
+      "name": "Transfer Completed"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "417fd4fb-7697-45d6-9010-f0f2316b8d57",
+              "name": "message",
+              "value": "Stock transfer completed successfully",
+              "type": "string"
+            },
+            {
+              "id": "ee67b000-eb4b-4561-a749-afa25a4e5e4e",
+              "name": "manager",
+              "value": "Warehouse Manager",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        464,
+        0
+      ],
+      "id": "25f6153f-cada-47a1-bdd0-c569798a5772",
+      "name": "Notify Warehouse Manager"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Transfer Completed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transfer Completed": {
+      "main": [
+        [
+          {
+            "node": "Notify Warehouse Manager",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "9e1c5411-55df-4f63-a435-bd25e3e001a6",
+  "meta": {
+    "instanceId": "2ab704fce2ecc3bb369ca4dbaa54887363cdf898fee84d184fb5ab172327f123"
+  },
+  "nodeGroups": [],
+  "id": "d6Z4hLmVHLlpP8zF",
+  "tags": []
+}
