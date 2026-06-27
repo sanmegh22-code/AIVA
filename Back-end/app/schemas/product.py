@@ -6,7 +6,6 @@ from pydantic import BaseModel, Field, field_validator
 class ProductCreate(BaseModel):
     name: str
     sku: str
-    quantity: int = Field(ge=0)
     price: float = Field(gt=0)
     category: str
 
@@ -24,7 +23,6 @@ class ProductCreate(BaseModel):
 class ProductUpdate(BaseModel):
     name: Optional[str] = None
     sku: Optional[str] = None
-    quantity: Optional[int] = Field(default=None, ge=0)
     price: Optional[float] = Field(default=None, gt=0)
     category: Optional[str] = None
 
@@ -47,7 +45,6 @@ class ProductResponse(BaseModel):
     id: int
     name: str
     sku: str
-    quantity: int
     price: float
     category: str
 

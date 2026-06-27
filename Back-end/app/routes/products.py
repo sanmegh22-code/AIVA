@@ -41,7 +41,6 @@ def create_product(
     new_product = Product(
         name=product.name,
         sku=product.sku,
-        quantity=product.quantity,
         price=product.price,
         category=product.category
     )
