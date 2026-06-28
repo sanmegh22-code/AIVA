@@ -84,6 +84,61 @@ class Warehouse(Base):
         back_populates="warehouse"
     )
 
+class Supplier(Base):
+    __tablename__ = "suppliers"
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
+
+    name = Column(
+        String,
+        nullable=False
+    )
+
+    email = Column(
+        String,
+        unique=True,
+        nullable=False
+    )
+
+    phone = Column(
+        String,
+        nullable=False
+    )
+
+    gst_number = Column(
+        String,
+        nullable=True
+    )
+
+    address = Column(
+        Text,
+        nullable=True
+    )
+
+    city = Column(
+        String,
+        nullable=True
+    )
+
+    state = Column(
+        String,
+        nullable=True
+    )
+
+    created_at = Column(
+        DateTime,
+        default=datetime.utcnow
+    )
+
+    updated_at = Column(
+        DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow
+    )
 
 class Product(Base):
     __tablename__ = "products"

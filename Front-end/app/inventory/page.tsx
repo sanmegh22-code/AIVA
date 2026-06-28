@@ -52,7 +52,7 @@ export default function InventoryPage() {
       .toLowerCase()
       .includes(search.toLowerCase());
 
-    const matchesCategory =
+      const matchesCategory =
       category === "All" || product.category === category;
 
     const matchesStatus =

@@ -23,6 +23,7 @@ from app.routes.warehouses import router as warehouse_router
 from app.routes.inventory import router as inventory_router
 from app.routes.product_images import router as product_image_router
 from app.routes.stock import router as stock_router
+from app.routes import suppliers
 
 from app.exceptions.handlers import register_exception_handlers
 
@@ -68,7 +69,7 @@ app.include_router(inventory_router)
 app.include_router(product_image_router)
 app.include_router(stock_router)
 app.include_router(dashboard_router)
-app.include_router(stock_router)
+app.include_router(suppliers.router)
 # -------------------------
 # Default Routes
 # -------------------------

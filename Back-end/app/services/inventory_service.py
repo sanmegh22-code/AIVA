@@ -1,5 +1,5 @@
 from fastapi import HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from app.core.logger import logger
 from app.db.models import Inventory, Product, Warehouse
@@ -24,9 +24,11 @@ class InventoryService:
 
         print("=" * 60)
 
-        product = db.query(Product).filter(
-            Product.id == data.product_id
-        ).first()
+        product = (
+            db.query(Product)
+            .filter(Product.id == data.product_id)
+            .first()
+        )
 
         if not product:
             raise HTTPException(
@@ -34,9 +36,11 @@ class InventoryService:
                 detail="Product not found"
             )
 
-        warehouse = db.query(Warehouse).filter(
-            Warehouse.id == data.warehouse_id
-        ).first()
+        warehouse = (
+            db.query(Warehouse)
+            .filter(Warehouse.id == data.warehouse_id)
+            .first()
+        )
 
         if not warehouse:
             raise HTTPException(
@@ -44,10 +48,14 @@ class InventoryService:
                 detail="Warehouse not found"
             )
 
-        existing = db.query(Inventory).filter(
-            Inventory.product_id == data.product_id,
-            Inventory.warehouse_id == data.warehouse_id
-        ).first()
+        existing = (
+            db.query(Inventory)
+            .filter(
+                Inventory.product_id == data.product_id,
+                Inventory.warehouse_id == data.warehouse_id,
+            )
+            .first()
+        )
 
         if existing:
             raise HTTPException(
@@ -66,7 +74,7 @@ class InventoryService:
             warehouse_id=data.warehouse_id,
             quantity=data.quantity,
             minimum_stock=data.minimum_stock,
-            maximum_stock=data.maximum_stock
+            maximum_stock=data.maximum_stock,
         )
 
         db.add(inventory)
@@ -83,14 +91,35 @@ class InventoryService:
 
     @staticmethod
     def get_all_inventory(db: Session):
-        return db.query(Inventory).all()
+
+        inventories = (
+            db.query(Inventory)
+            .options(
+                joinedload(Inventory.product),
+                joinedload(Inventory.warehouse),
+            )
+            .all()
+        )
+
+        return inventories
 
     @staticmethod
-    def get_inventory(db: Session, inventory_id: int):
+    def get_inventory(
+        db: Session,
+        inventory_id: int,
+    ):
 
-        inventory = db.query(Inventory).filter(
-            Inventory.id == inventory_id
-        ).first()
+        inventory = (
+            db.query(Inventory)
+            .options(
+                joinedload(Inventory.product),
+                joinedload(Inventory.warehouse),
+            )
+            .filter(
+                Inventory.id == inventory_id
+            )
+            .first()
+        )
 
         if not inventory:
             raise HTTPException(
@@ -105,12 +134,12 @@ class InventoryService:
         db: Session,
         inventory_id: int,
         data,
-        current_user
+        current_user,
     ):
 
         inventory = InventoryService.get_inventory(
             db,
-            inventory_id
+            inventory_id,
         )
 
         update_data = data.model_dump(
@@ -120,7 +149,8 @@ class InventoryService:
         if (
             "minimum_stock" in update_data
             and "maximum_stock" in update_data
-            and update_data["minimum_stock"] > update_data["maximum_stock"]
+            and update_data["minimum_stock"]
+            > update_data["maximum_stock"]
         ):
             raise HTTPException(
                 status_code=400,
@@ -128,7 +158,11 @@ class InventoryService:
             )
 
         for key, value in update_data.items():
-            setattr(inventory, key, value)
+            setattr(
+                inventory,
+                key,
+                value,
+            )
 
         db.commit()
         db.refresh(inventory)
@@ -143,12 +177,12 @@ class InventoryService:
     def delete_inventory(
         db: Session,
         inventory_id: int,
-        current_user
+        current_user,
     ):
 
         inventory = InventoryService.get_inventory(
             db,
-            inventory_id
+            inventory_id,
         )
 
         if inventory.quantity > 0:
@@ -166,5 +200,5 @@ class InventoryService:
 
         return {
             "success": True,
-            "message": "Inventory deleted successfully"
+            "message": "Inventory deleted successfully",
         }
