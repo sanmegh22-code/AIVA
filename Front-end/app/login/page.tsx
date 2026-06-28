@@ -47,18 +47,18 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#f8f8f5]">
-      <div className="w-full max-w-md bg-white rounded-3xl shadow-xl p-10">
-        <h1 className="text-5xl font-bold text-center text-zinc-800 mb-3">
+    <div className="min-h-screen flex items-center justify-center bg-[#f8f8f5] dark:bg-[#09090B] transition-colors duration-300">
+      <div className="w-full max-w-md rounded-3xl border border-zinc-200 bg-white p-10 shadow-xl transition-colors duration-300 dark:border-zinc-800 dark:bg-zinc-900">
+        <h1 className="mb-3 text-center text-5xl font-bold text-zinc-900 dark:text-white">
           AIVA
         </h1>
 
-        <p className="text-center text-zinc-500 mb-10">
+        <p className="mb-10 text-center text-zinc-500 dark:text-zinc-400">
           Inventory Management System
         </p>
 
         {error && (
-          <div className="mb-4 text-center text-red-500">
+          <div className="mb-4 rounded-xl bg-red-100 p-3 text-center text-red-600 dark:bg-red-900/30 dark:text-red-400">
             {error}
           </div>
         )}
@@ -69,7 +69,7 @@ export default function LoginPage() {
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-3 border rounded-xl"
+            className="w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-black outline-none transition focus:border-black dark:border-zinc-700 dark:bg-zinc-800 dark:text-white dark:focus:border-white"
           />
 
           <input
@@ -77,13 +77,13 @@ export default function LoginPage() {
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-4 py-3 border rounded-xl"
+            className="w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-black outline-none transition focus:border-black dark:border-zinc-700 dark:bg-zinc-800 dark:text-white dark:focus:border-white"
           />
 
           <button
             onClick={handleLogin}
             disabled={loading}
-            className="w-full bg-zinc-900 text-white py-3 rounded-xl"
+            className="w-full rounded-xl bg-black py-3 font-semibold text-white transition hover:opacity-90 dark:bg-white dark:text-black"
           >
             {loading ? "Signing In..." : "Sign In"}
           </button>

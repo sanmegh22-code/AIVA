@@ -1,208 +1,537 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
+
+import Sidebar from "../../components/Sidebar";
+import Navbar from "../../components/Navbar";
+
+import Button from "../../components/ui/Button";
+import Skeleton from "../../components/ui/Skeleton";
+
+import {
+  Package,
+  Search,
+  Plus,
+  Warehouse,
+} from "lucide-react";
+
+import { getInventory } from "../services/inventory";
+
+interface InventoryItem {
+
+  id: number;
+
+  quantity: number;
+
+  minimum_stock: number;
+
+  maximum_stock: number;
+
+  product: {
+
+    id: number;
+
+    name: string;
+
+    sku: string;
+
+    category: string;
+
+    price: number;
+
+  };
+
+  warehouse: {
+
+    id: number;
+
+    name: string;
+
+    code: string;
+
+  };
+
+}
 
 export default function InventoryPage() {
-  const products = [
-    {
-      id: 1,
-      name: "Laptop",
-      sku: "LP001",
-      category: "Electronics",
-      stock: 50,
-      price: "₹50,000",
-      status: "In Stock",
-    },
-    {
-      id: 2,
-      name: "Mouse",
-      sku: "MS002",
-      category: "Accessories",
-      stock: 5,
-      price: "₹500",
-      status: "Low Stock",
-    },
-    {
-      id: 3,
-      name: "Keyboard",
-      sku: "KB003",
-      category: "Accessories",
-      stock: 25,
-      price: "₹1,200",
-      status: "In Stock",
-    },
-    {
-      id: 4,
-      name: "Monitor",
-      sku: "MN004",
-      category: "Electronics",
-      stock: 0,
-      price: "₹12,000",
-      status: "Out of Stock",
-    },
-  ];
 
-  const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("All");
-  const [status, setStatus] = useState("All");
+  const [loading, setLoading] =
+    useState(true);
 
-  const filteredProducts = products.filter((product) => {
-    const matchesSearch = product.name
-      .toLowerCase()
-      .includes(search.toLowerCase());
+  const [inventory, setInventory] =
+    useState<InventoryItem[]>([]);
 
-      const matchesCategory =
-      category === "All" || product.category === category;
+  const [search, setSearch] =
+    useState("");
 
-    const matchesStatus =
-      status === "All" || product.status === status;
+  useEffect(() => {
 
-    return matchesSearch && matchesCategory && matchesStatus;
-  });
+    async function loadInventory() {
+
+      try {
+
+        const data =
+          await getInventory();
+
+        setInventory(data);
+
+      } catch (err) {
+
+        console.error(err);
+
+      } finally {
+
+        setLoading(false);
+
+      }
+
+    }
+
+    loadInventory();
+
+  }, []);
+
+  const filteredInventory =
+    useMemo(() => {
+
+      return inventory.filter((item) =>
+
+        item.product.name
+          .toLowerCase()
+          .includes(search.toLowerCase())
+
+        ||
+
+        item.product.sku
+          .toLowerCase()
+          .includes(search.toLowerCase())
+
+        ||
+
+        item.warehouse.name
+          .toLowerCase()
+          .includes(search.toLowerCase())
+
+      );
+
+    }, [inventory, search]);
 
   return (
-    <div className="p-8">
 
-      {/* Header */}
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-4xl font-bold">Inventory</h1>
+    <div className="flex min-h-screen bg-[#09090B] text-white">
 
-        <Link href="/add-product">
-          <button className="bg-black text-white px-5 py-3 rounded-lg">
-            + Add Product
-          </button>
-        </Link>
-      </div>
+      <Sidebar />
 
-      {/* Summary Cards */}
-      <div className="grid md:grid-cols-4 gap-4 mb-8">
+      <div className="flex-1">
 
-        <div className="border rounded-xl p-5 bg-white">
-          <p className="text-gray-500">Total Items</p>
-          <h2 className="text-3xl font-bold">1250</h2>
-        </div>
+        <Navbar />
 
-        <div className="border rounded-xl p-5 bg-white">
-          <p className="text-gray-500">Low Stock</p>
-          <h2 className="text-3xl font-bold text-yellow-600">23</h2>
-        </div>
+        <main className="p-8">
 
-        <div className="border rounded-xl p-5 bg-white">
-          <p className="text-gray-500">Out Of Stock</p>
-          <h2 className="text-3xl font-bold text-red-600">5</h2>
-        </div>
+          {/* Header */}
 
-        <div className="border rounded-xl p-5 bg-white">
-          <p className="text-gray-500">Inventory Value</p>
-          <h2 className="text-3xl font-bold">₹12.5L</h2>
-        </div>
+          <div className="flex flex-col lg:flex-row justify-between gap-8 mb-10">
 
-      </div>
+            <div>
 
-      {/* Filters */}
-      <div className="flex gap-4 mb-6 flex-wrap">
+              <h1 className="text-5xl font-black">
 
-        <input
-          type="text"
-          placeholder="Search Product..."
-          className="border rounded-lg px-4 py-3 w-72"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+                Inventory
 
-        <select
-          className="border rounded-lg px-4 py-3"
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-        >
-          <option>All</option>
-          <option>Electronics</option>
-          <option>Accessories</option>
-        </select>
+              </h1>
 
-        <select
-          className="border rounded-lg px-4 py-3"
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-        >
-          <option>All</option>
-          <option>In Stock</option>
-          <option>Low Stock</option>
-          <option>Out of Stock</option>
-        </select>
+              <p className="mt-3 text-zinc-400">
 
-      </div>
+                Manage warehouse inventory and stock levels.
 
-      {/* Table */}
-      <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+              </p>
 
-        <table className="w-full">
+            </div>
 
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="p-4 text-left">Product</th>
-              <th className="p-4 text-left">SKU</th>
-              <th className="p-4 text-left">Category</th>
-              <th className="p-4 text-left">Stock</th>
-              <th className="p-4 text-left">Price</th>
-              <th className="p-4 text-left">Status</th>
-              <th className="p-4 text-left">Action</th>
-            </tr>
-          </thead>
+            <Button>
 
-          <tbody>
+              <Plus size={18} />
 
-            {filteredProducts.map((product) => (
-              <tr key={product.id} className="border-t">
+              <span className="ml-2">
 
-                <td className="p-4">{product.name}</td>
+                Add Inventory
 
-                <td className="p-4">{product.sku}</td>
+              </span>
 
-                <td className="p-4">{product.category}</td>
+            </Button>
 
-                <td className="p-4">{product.stock}</td>
+          </div>
 
-                <td className="p-4">{product.price}</td>
+          {/* Search */}
 
-                <td className="p-4">
-                  <span
-                    className={`px-3 py-1 rounded-full text-sm ${
-                      product.status === "In Stock"
-                        ? "bg-green-100 text-green-700"
-                        : product.status === "Low Stock"
-                        ? "bg-yellow-100 text-yellow-700"
-                        : "bg-red-100 text-red-700"
-                    }`}
-                  >
-                    {product.status}
-                  </span>
-                </td>
+          <div className="relative mb-10">
 
-                <td className="p-4 flex gap-2">
+            <Search
+              size={18}
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500"
+            />
 
-                  <Link href={`/products/${product.id}`}>
-                    <button className="bg-blue-600 text-white px-3 py-2 rounded">
-                      View
-                    </button>
-                  </Link>
+            <input
 
-                  <button className="bg-gray-800 text-white px-3 py-2 rounded">
-                    Update
-                  </button>
+              placeholder="Search inventory..."
 
-                </td>
+              value={search}
 
-              </tr>
-            ))}
+              onChange={(e)=>setSearch(e.target.value)}
 
-          </tbody>
+              className="pl-12"
 
-        </table>
+            />
+
+          </div>
+          <div className="overflow-hidden rounded-3xl border border-zinc-800 bg-[#18181B] shadow-xl">
+
+            <div className="overflow-x-auto">
+
+              <table className="w-full">
+
+                <thead className="bg-zinc-900">
+
+                  <tr>
+
+                    <th className="px-6 py-5 text-left">Product</th>
+
+                    <th className="px-6 py-5 text-left">Warehouse</th>
+
+                    <th className="px-6 py-5 text-left">Quantity</th>
+
+                    <th className="px-6 py-5 text-left">Stock Level</th>
+
+                    <th className="px-6 py-5 text-left">Price</th>
+
+                    <th className="px-6 py-5 text-center">Status</th>
+
+                  </tr>
+
+                </thead>
+
+                <tbody>
+
+                  {loading ? (
+
+                    [...Array(6)].map((_, index) => (
+
+                      <tr
+                        key={index}
+                        className="border-t border-zinc-800"
+                      >
+
+                        <td
+                          colSpan={6}
+                          className="px-6 py-5"
+                        >
+
+                          <Skeleton className="h-14 rounded-xl" />
+
+                        </td>
+
+                      </tr>
+
+                    ))
+
+                  ) : filteredInventory.length === 0 ? (
+
+                    <tr>
+
+                      <td
+                        colSpan={6}
+                        className="py-20 text-center"
+                      >
+
+                        <Package
+                          size={60}
+                          className="mx-auto text-zinc-700"
+                        />
+
+                        <p className="mt-4 text-zinc-500">
+
+                          No Inventory Found
+
+                        </p>
+
+                      </td>
+
+                    </tr>
+
+                  ) : (
+
+                    filteredInventory.map((item) => {
+
+                      const percentage = Math.min(
+                        (item.quantity / item.maximum_stock) * 100,
+                        100
+                      );
+
+                      return (
+
+                        <tr
+                          key={item.id}
+                          className="border-t border-zinc-800 hover:bg-zinc-900 transition"
+                        >
+
+                          {/* Product */}
+
+                          <td className="px-6 py-5">
+
+                            <div>
+
+                              <h3 className="font-semibold">
+
+                                {item.product.name}
+
+                              </h3>
+
+                              <p className="mt-1 text-sm text-zinc-500">
+
+                                {item.product.sku}
+
+                              </p>
+
+                              <span className="mt-2 inline-block rounded-full bg-zinc-800 px-3 py-1 text-xs">
+
+                                {item.product.category}
+
+                              </span>
+
+                            </div>
+
+                          </td>
+
+                          {/* Warehouse */}
+
+                          <td className="px-6 py-5">
+
+                            <div className="flex items-center gap-3">
+
+                              <Warehouse
+                                size={18}
+                                className="text-zinc-500"
+                              />
+
+                              <div>
+
+                                <p className="font-medium">
+
+                                  {item.warehouse.name}
+
+                                </p>
+
+                                <p className="text-xs text-zinc-500">
+
+                                  {item.warehouse.code}
+
+                                </p>
+
+                              </div>
+
+                            </div>
+
+                          </td>
+
+                          {/* Quantity */}
+
+                          <td className="px-6 py-5">
+
+                            <span className="text-2xl font-bold">
+
+                              {item.quantity}
+
+                            </span>
+
+                          </td>
+
+                          {/* Stock Progress */}
+
+                          <td className="px-6 py-5">
+
+                            <div className="w-52">
+
+                              <div className="h-3 rounded-full bg-zinc-800">
+
+                                <div
+                                  className="h-3 rounded-full bg-white transition-all duration-700"
+                                  style={{
+                                    width: `${percentage}%`,
+                                  }}
+                                />
+
+                              </div>
+
+                              <div className="mt-2 flex justify-between text-xs text-zinc-500">
+
+                                <span>
+
+                                  Min {item.minimum_stock}
+
+                                </span>
+
+                                <span>
+
+                                  Max {item.maximum_stock}
+
+                                </span>
+
+                              </div>
+
+                            </div>
+
+                          </td>
+
+                          {/* Price */}
+
+                          <td className="px-6 py-5 font-bold">
+
+                            ₹{item.product.price.toLocaleString()}
+
+                          </td>
+
+                          {/* Status */}
+
+                          {/* Status */}
+
+<td className="px-6 py-5 text-center">
+
+  {item.quantity <= 0 ? (
+
+    <span className="rounded-full bg-red-500/20 px-4 py-2 text-sm font-semibold text-red-400">
+      Out of Stock
+    </span>
+
+  ) : item.quantity <= item.minimum_stock ? (
+
+    <span className="rounded-full bg-yellow-500/20 px-4 py-2 text-sm font-semibold text-yellow-400">
+      Low Stock
+    </span>
+
+  ) : (
+
+    <span className="rounded-full bg-green-500/20 px-4 py-2 text-sm font-semibold text-green-400">
+      Healthy
+    </span>
+
+  )}
+
+</td>
+
+                        </tr>
+
+                      );
+
+                    })
+
+                  )}
+
+                </tbody>
+
+              </table>
+
+            </div>
+
+          </div>
+
+          {/* Summary */}
+
+          {!loading && (
+
+            <div className="mt-10 grid gap-6 md:grid-cols-3">
+
+              <div className="rounded-3xl border border-zinc-800 bg-[#18181B] p-7">
+
+                <h3 className="text-lg font-bold">
+
+                  Total Inventory
+
+                </h3>
+
+                <p className="mt-5 text-5xl font-black">
+
+                  {inventory.length}
+
+                </p>
+
+              </div>
+
+              <div className="rounded-3xl border border-zinc-800 bg-[#18181B] p-7">
+
+                <h3 className="text-lg font-bold">
+
+                  Low Stock Items
+
+                </h3>
+
+                <p className="mt-5 text-5xl font-black text-yellow-400">
+
+                  {
+
+                    inventory.filter(
+
+                      (i) =>
+
+                        i.quantity <= i.minimum_stock
+
+                        &&
+
+                        i.quantity > 0
+
+                    ).length
+
+                  }
+
+                </p>
+
+              </div>
+
+              <div className="rounded-3xl border border-zinc-800 bg-[#18181B] p-7">
+
+                <h3 className="text-lg font-bold">
+
+                  Inventory Value
+
+                </h3>
+
+                <p className="mt-5 text-4xl font-black">
+
+                  ₹{
+
+                    inventory
+
+                      .reduce(
+
+                        (sum, item) =>
+
+                          sum +
+
+                          item.quantity *
+
+                          item.product.price,
+
+                        0
+
+                      )
+
+                      .toLocaleString()
+
+                  }
+
+                </p>
+
+              </div>
+
+            </div>
+
+          )}
+
+        </main>
 
       </div>
 
     </div>
+
   );
+
 }
