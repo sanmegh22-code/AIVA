@@ -14,7 +14,7 @@ from app.db.models import (
 from app.routes.dashboard import (
     router as dashboard_router,
 )
-
+from app.routes.reports import router as reports_router
 from app.routes.auth import router as auth_router
 from app.routes.products import router as product_router
 from app.routes.users import router as users_router
@@ -70,6 +70,7 @@ app.include_router(product_image_router)
 app.include_router(stock_router)
 app.include_router(dashboard_router)
 app.include_router(suppliers.router)
+app.include_router(reports_router)
 # -------------------------
 # Default Routes
 # -------------------------

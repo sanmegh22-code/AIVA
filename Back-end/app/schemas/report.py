@@ -1,13 +1,16 @@
 from pydantic import BaseModel
 
 
-class DashboardSummary(BaseModel):
+class ReportSummary(BaseModel):
     total_products: int
     total_categories: int
+    total_suppliers: int
     total_warehouses: int
     total_inventory: int
-    low_stock: int
 
     inventory_value: float
-    healthy_inventory: int
+
+    low_stock: int
     out_of_stock: int
+
+    monthly_growth: float

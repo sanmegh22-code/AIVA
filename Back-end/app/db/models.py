@@ -166,6 +166,12 @@ class Product(Base):
         default="General"
     )
 
+    quantity = Column(
+        Integer,
+        default=0,
+        nullable=False
+    )
+
     image_url = Column(
         String,
         nullable=True

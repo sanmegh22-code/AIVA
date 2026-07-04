@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.orm import declarative_base, sessionmaker
 
 from app.core.config import settings
@@ -12,6 +12,23 @@ SessionLocal = sessionmaker(
 )
 
 Base = declarative_base()
+
+
+def ensure_schema():
+    inspector = inspect(engine)
+    tables = inspector.get_table_names()
+
+    if "products" in tables:
+        columns = {column["name"] for column in inspector.get_columns("products")}
+
+        if "quantity" not in columns:
+            with engine.begin() as connection:
+                connection.execute(
+                    text("ALTER TABLE products ADD COLUMN quantity INTEGER NOT NULL DEFAULT 0")
+                )
+
+
+ensure_schema()
 
 
 def get_db():

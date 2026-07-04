@@ -8,6 +8,7 @@ class ProductCreate(BaseModel):
     sku: str
     price: float = Field(gt=0)
     category: str
+    quantity: int = Field(default=0, ge=0)
 
     @field_validator("name", "sku", "category")
     @classmethod
@@ -25,6 +26,7 @@ class ProductUpdate(BaseModel):
     sku: Optional[str] = None
     price: Optional[float] = Field(default=None, gt=0)
     category: Optional[str] = None
+    quantity: Optional[int] = Field(default=None, ge=0)
 
     @field_validator("name", "sku", "category")
     @classmethod
@@ -47,6 +49,8 @@ class ProductResponse(BaseModel):
     sku: str
     price: float
     category: str
+    quantity: int
+    image_url: Optional[str] = None
 
     class Config:
         from_attributes = True

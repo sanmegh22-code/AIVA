@@ -29,6 +29,29 @@ class DashboardService:
             )
             .count()
         )
+        inventory_value = 0
+
+        inventories = (
+            db.query(Inventory)
+            .all()
+        )
+
+        healthy_inventory = 0
+        out_of_stock = 0
+
+        for item in inventories:
+
+            if item.product is not None:
+                inventory_value += (
+                    item.quantity *
+                    item.product.price
+                )
+
+            if item.quantity == 0:
+                out_of_stock += 1
+
+            elif item.quantity > item.minimum_stock:
+                healthy_inventory += 1
 
         return {
             "total_products": total_products,
@@ -36,6 +59,9 @@ class DashboardService:
             "total_warehouses": total_warehouses,
             "total_inventory": total_inventory,
             "low_stock": low_stock,
+            "inventory_value": inventory_value,
+            "healthy_inventory": healthy_inventory,
+            "out_of_stock": out_of_stock,
         }
 
     @staticmethod

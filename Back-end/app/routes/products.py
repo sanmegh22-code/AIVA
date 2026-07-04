@@ -42,7 +42,8 @@ def create_product(
         name=product.name,
         sku=product.sku,
         price=product.price,
-        category=product.category
+        category=product.category,
+        quantity=product.quantity,
     )
 
     db.add(new_product)
