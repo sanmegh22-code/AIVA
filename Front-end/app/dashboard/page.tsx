@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import Sidebar from "../../components/Sidebar";
 import Navbar from "../../components/Navbar";
@@ -31,18 +32,23 @@ interface MovementItem {
 }
 
 export default function DashboardPage() {
+  const router = useRouter();
 
   const [loading, setLoading] =
     useState(true);
 
   const [summary, setSummary] =
-    useState({
-      total_products: 0,
-      total_categories: 0,
-      total_warehouses: 0,
-      total_inventory: 0,
-      low_stock: 0,
-    });
+  useState({
+    total_products: 0,
+    total_categories: 0,
+    total_warehouses: 0,
+    total_inventory: 0,
+    low_stock: 0,
+
+    inventory_value: 0,
+    healthy_inventory: 0,
+    out_of_stock: 0,
+  });
 
   const [movements, setMovements] =
     useState<MovementItem[]>([]);
@@ -119,27 +125,28 @@ export default function DashboardPage() {
 
               <div className="flex gap-4">
 
-                <Button>
+                 <Button onClick={() => router.push("/add-product")}>
 
-                  <Plus size={18} />
+                <Plus size={18} />
 
                   <span className="ml-2">
 
                     Add Product
 
-                  </span>
+                    </span>
 
                 </Button>
-
-                <Button variant="secondary">
+                <Button variant="secondary" onClick={() => router.push("/reports")}>
 
                   <FileText size={18} />
 
-                  <span className="ml-2">
+                    <span className="ml-2">
 
-                    Reports
+                        Reports
 
-                  </span>
+                      </span> 
+
+                
 
                 </Button>
 
@@ -221,27 +228,47 @@ export default function DashboardPage() {
 
               </p>
 
-              <div className="mt-8 h-4 rounded-full bg-zinc-800">
+             <div className="mt-8 h-4 rounded-full bg-zinc-800">
 
-                <div className="h-4 w-4/5 rounded-full bg-white transition-all duration-700" />
+  <div
+    className="h-4 rounded-full bg-green-500 transition-all duration-700"
+    style={{
+      width: `${
+        summary.total_inventory === 0
+          ? 0
+          : (
+              (summary.healthy_inventory /
+                summary.total_inventory) *
+              100
+            ).toFixed(0)
+      }%`,
+    }}
+  />
 
-              </div>
+</div>
 
-              <div className="mt-5 flex justify-between">
+<div className="mt-5 flex justify-between">
 
-                <span className="text-zinc-500">
+  <span className="text-zinc-500">
 
-                  Healthy Stock
+    Healthy Stock
 
-                </span>
+  </span>
 
-                <span className="font-bold">
+  <span className="font-bold">
 
-                  80%
+    {summary.total_inventory === 0
+      ? 0
+      : (
+          (summary.healthy_inventory /
+            summary.total_inventory) *
+          100
+        ).toFixed(0)}
+    %
 
-                </span>
+  </span>
 
-              </div>
+</div>
 
             </div>
 
@@ -263,7 +290,7 @@ export default function DashboardPage() {
 
               <h1 className="mt-8 text-5xl font-black">
 
-                ₹2.4L
+                ₹{summary.inventory_value.toLocaleString('en-IN')}
 
               </h1>
 
@@ -334,9 +361,14 @@ export default function DashboardPage() {
 
                 </div>
 
-                <Button variant="secondary">
-                  View All
-                </Button>
+                <Button
+  variant="secondary"
+  onClick={() => router.push("/inventory")}
+>
+
+  View All
+
+</Button>
 
               </div>
 
