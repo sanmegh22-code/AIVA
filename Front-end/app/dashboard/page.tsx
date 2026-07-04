@@ -31,45 +31,40 @@ interface MovementItem {
   reference?: string | null;
 }
 
+interface DashboardSummary {
+  total_products: number;
+  total_categories: number;
+  total_warehouses: number;
+  total_inventory: number;
+  low_stock: number;
+  inventory_value: number;
+  healthy_inventory: number;
+  out_of_stock: number;
+}
+
 export default function DashboardPage() {
   const router = useRouter();
 
-  const [loading, setLoading] =
-    useState(true);
+  const [loading, setLoading] = useState(true);
 
   const [summary, setSummary] =
-<<<<<<< Updated upstream
-  useState({
-    total_products: 0,
-    total_categories: 0,
-    total_warehouses: 0,
-    total_inventory: 0,
-    low_stock: 0,
-
-    inventory_value: 0,
-    healthy_inventory: 0,
-    out_of_stock: 0,
-  });
-=======
-    useState({
+    useState<DashboardSummary>({
       total_products: 0,
       total_categories: 0,
       total_warehouses: 0,
       total_inventory: 0,
       low_stock: 0,
+      inventory_value: 0,
+      healthy_inventory: 0,
+      out_of_stock: 0,
     });
-    console.log("Dashboard Version 5");
->>>>>>> Stashed changes
 
   const [movements, setMovements] =
     useState<MovementItem[]>([]);
 
   useEffect(() => {
-
     async function loadDashboard() {
-
       try {
-
         const dashboard =
           await getDashboardSummary();
 
@@ -78,25 +73,17 @@ export default function DashboardPage() {
 
         setSummary(dashboard);
         setMovements(recent);
-
-      } catch (err) {
-
-        console.error(err);
-
+      } catch (error) {
+        console.error(error);
       } finally {
-
         setLoading(false);
-
       }
-
     }
 
     loadDashboard();
-
   }, []);
 
   return (
-
     <div className="flex min-h-screen bg-[#09090B] text-white">
 
       <Sidebar />
@@ -111,7 +98,7 @@ export default function DashboardPage() {
 
           <section className="rounded-3xl border border-zinc-800 bg-gradient-to-r from-black via-zinc-950 to-zinc-900 p-10 shadow-2xl">
 
-            <div className="flex flex-col lg:flex-row justify-between gap-10">
+            <div className="flex flex-col justify-between gap-10 lg:flex-row">
 
               <div>
 
@@ -121,14 +108,14 @@ export default function DashboardPage() {
 
                 </h1>
 
-                <p className="mt-5 max-w-2xl text-lg text-zinc-400 leading-8">
+                <p className="mt-5 max-w-2xl text-lg leading-8 text-zinc-400">
 
                   Manage products,
                   suppliers,
-                  warehouses and
-                  inventory with
-                  AIVA Inventory
-                  Management.
+                  warehouses,
+                  inventory and reports
+                  using AIVA Inventory
+                  Management System.
 
                 </p>
 
@@ -136,29 +123,27 @@ export default function DashboardPage() {
 
               <div className="flex gap-4">
 
-                 <Button onClick={() => router.push("/add-product")}>
-
-                <Plus size={18} />
-
+                <Button
+                  onClick={() =>
+                    router.push("/add-product")
+                  }
+                >
+                  <Plus size={18} />
                   <span className="ml-2">
-
                     Add Product
-
-                    </span>
-
+                  </span>
                 </Button>
-                <Button variant="secondary" onClick={() => router.push("/reports")}>
 
+                <Button
+                  variant="secondary"
+                  onClick={() =>
+                    router.push("/reports")
+                  }
+                >
                   <FileText size={18} />
-
-                    <span className="ml-2">
-
-                        Reports
-
-                      </span> 
-
-                
-
+                  <span className="ml-2">
+                    Reports
+                  </span>
                 </Button>
 
               </div>
@@ -166,6 +151,7 @@ export default function DashboardPage() {
             </div>
 
           </section>
+
           {/* Statistics */}
 
           <div className="mt-10">
@@ -218,7 +204,6 @@ export default function DashboardPage() {
             )}
 
           </div>
-
           {/* Analytics */}
 
           <div className="mt-10 grid gap-6 lg:grid-cols-3">
@@ -228,58 +213,52 @@ export default function DashboardPage() {
             <div className="rounded-3xl border border-zinc-800 bg-[#18181B] p-8">
 
               <h2 className="text-2xl font-bold">
-
                 Inventory Health
-
               </h2>
 
               <p className="mt-3 text-zinc-400">
-
                 Current warehouse stock condition.
-
               </p>
 
-             <div className="mt-8 h-4 rounded-full bg-zinc-800">
+              <div className="mt-8 h-4 rounded-full bg-zinc-800">
 
-  <div
-    className="h-4 rounded-full bg-green-500 transition-all duration-700"
-    style={{
-      width: `${
-        summary.total_inventory === 0
-          ? 0
-          : (
-              (summary.healthy_inventory /
-                summary.total_inventory) *
-              100
-            ).toFixed(0)
-      }%`,
-    }}
-  />
+                <div
+                  className="h-4 rounded-full bg-green-500 transition-all duration-700"
+                  style={{
+                    width: `${
+                      summary.total_inventory === 0
+                        ? 0
+                        : (
+                            (summary.healthy_inventory /
+                              summary.total_inventory) *
+                            100
+                          ).toFixed(0)
+                    }%`,
+                  }}
+                />
 
-</div>
+              </div>
 
-<div className="mt-5 flex justify-between">
+              <div className="mt-5 flex justify-between">
 
-  <span className="text-zinc-500">
+                <span className="text-zinc-500">
+                  Healthy Stock
+                </span>
 
-    Healthy Stock
+                <span className="font-bold">
 
-  </span>
+                  {summary.total_inventory === 0
+                    ? 0
+                    : (
+                        (summary.healthy_inventory /
+                          summary.total_inventory) *
+                        100
+                      ).toFixed(0)}
+                  %
 
-  <span className="font-bold">
+                </span>
 
-    {summary.total_inventory === 0
-      ? 0
-      : (
-          (summary.healthy_inventory /
-            summary.total_inventory) *
-          100
-        ).toFixed(0)}
-    %
-
-  </span>
-
-</div>
+              </div>
 
             </div>
 
@@ -288,77 +267,65 @@ export default function DashboardPage() {
             <div className="rounded-3xl border border-zinc-800 bg-[#18181B] p-8">
 
               <h2 className="text-2xl font-bold">
-
                 Inventory Value
-
               </h2>
 
               <p className="mt-3 text-zinc-400">
-
                 Estimated total stock value.
-
               </p>
 
               <h1 className="mt-8 text-5xl font-black">
 
-                ₹{summary.inventory_value.toLocaleString('en-IN')}
+                ₹
+                {summary.inventory_value.toLocaleString("en-IN")}
 
               </h1>
 
               <p className="mt-4 text-zinc-500">
-
                 Updated automatically
-
               </p>
 
             </div>
 
-            {/* Backend */}
+            {/* System Status */}
 
             <div className="rounded-3xl border border-zinc-800 bg-[#18181B] p-8">
 
               <h2 className="text-2xl font-bold">
-
                 System Status
-
               </h2>
 
               <p className="mt-3 text-zinc-400">
-
                 API & Database Monitoring
-
               </p>
 
               <div className="mt-8 flex items-center gap-4">
 
-                <div className="h-4 w-4 rounded-full bg-green-500 animate-pulse" />
+                <div className="h-4 w-4 animate-pulse rounded-full bg-green-500" />
 
                 <span className="font-semibold text-green-400">
-
                   Backend Online
-
                 </span>
 
               </div>
 
               <p className="mt-6 text-zinc-500">
-
                 All services are responding normally.
-
               </p>
 
             </div>
 
           </div>
+
           {/* Bottom Section */}
 
-          <div className="mt-10 grid grid-cols-1 xl:grid-cols-3 gap-6">
+          <div className="mt-10 grid grid-cols-1 gap-6 xl:grid-cols-3">
 
             {/* Recent Activity */}
 
             <div className="xl:col-span-2 rounded-3xl border border-zinc-800 bg-[#18181B] p-8">
 
-              <div className="flex items-center justify-between mb-8">
+              <div className="mb-8 flex items-center justify-between">
 
                 <div>
 
@@ -373,13 +340,11 @@ export default function DashboardPage() {
                 </div>
 
                 <Button
-  variant="secondary"
-  onClick={() => router.push("/inventory")}
->
-
-  View All
-
-</Button>
+                  variant="secondary"
+                  onClick={() => router.push("/inventory")}
+                >
+                  View All
+                </Button>
 
               </div>
 
@@ -415,7 +380,7 @@ export default function DashboardPage() {
 
                       <div>
 
-                        <h3 className="font-semibold text-lg">
+                        <h3 className="text-lg font-semibold">
                           {movement.movement_type}
                         </h3>
 
@@ -446,10 +411,11 @@ export default function DashboardPage() {
               )}
 
             </div>
-
-            {/* AI Insights */}
+            {/* Right Side */}
 
             <div className="space-y-6">
+
+              {/* Today's Summary */}
 
               <div className="rounded-3xl border border-zinc-800 bg-[#18181B] p-8">
 
@@ -460,30 +426,80 @@ export default function DashboardPage() {
                 <div className="mt-8 space-y-5">
 
                   <div className="flex justify-between">
-                    <span className="text-zinc-500">Products</span>
-                    <span className="font-bold">{summary.total_products}</span>
+                    <span className="text-zinc-500">
+                      Products
+                    </span>
+
+                    <span className="font-bold">
+                      {summary.total_products}
+                    </span>
                   </div>
 
                   <div className="flex justify-between">
-                    <span className="text-zinc-500">Categories</span>
-                    <span className="font-bold">{summary.total_categories}</span>
+                    <span className="text-zinc-500">
+                      Categories
+                    </span>
+
+                    <span className="font-bold">
+                      {summary.total_categories}
+                    </span>
                   </div>
 
                   <div className="flex justify-between">
-                    <span className="text-zinc-500">Warehouses</span>
-                    <span className="font-bold">{summary.total_warehouses}</span>
+                    <span className="text-zinc-500">
+                      Warehouses
+                    </span>
+
+                    <span className="font-bold">
+                      {summary.total_warehouses}
+                    </span>
                   </div>
 
                   <div className="flex justify-between">
-                    <span className="text-zinc-500">Low Stock</span>
+                    <span className="text-zinc-500">
+                      Inventory
+                    </span>
+
+                    <span className="font-bold">
+                      {summary.total_inventory}
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between">
+                    <span className="text-zinc-500">
+                      Low Stock
+                    </span>
+
                     <span className="font-bold text-red-400">
                       {summary.low_stock}
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between">
+                    <span className="text-zinc-500">
+                      Healthy
+                    </span>
+
+                    <span className="font-bold text-green-400">
+                      {summary.healthy_inventory}
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between">
+                    <span className="text-zinc-500">
+                      Out Of Stock
+                    </span>
+
+                    <span className="font-bold text-red-500">
+                      {summary.out_of_stock}
                     </span>
                   </div>
 
                 </div>
 
               </div>
+
+              {/* AI Insights */}
 
               <div className="rounded-3xl border border-zinc-800 bg-gradient-to-br from-zinc-900 via-black to-zinc-950 p-8">
 
@@ -495,12 +511,13 @@ export default function DashboardPage() {
 
                   Inventory performance is healthy.
 
-                  Products with low stock should
-                  be restocked soon.
+                  Products with low stock should be
+                  replenished soon.
 
-                  Supplier response time has
-                  improved compared to the
-                  previous week.
+                  Warehouse utilization remains stable.
+
+                  Supplier response time has improved
+                  compared to the previous week.
 
                 </p>
 
@@ -509,14 +526,13 @@ export default function DashboardPage() {
             </div>
 
           </div>
-
         </main>
 
         {/* Footer */}
 
         <footer className="border-t border-zinc-800 px-8 py-6">
 
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
 
             <div>
 
@@ -524,7 +540,7 @@ export default function DashboardPage() {
                 AIVA Inventory Management
               </h3>
 
-              <p className="text-sm text-zinc-500 mt-1">
+              <p className="mt-1 text-sm text-zinc-500">
                 AI Powered Inventory Management System
               </p>
 
@@ -532,9 +548,13 @@ export default function DashboardPage() {
 
             <div className="flex gap-8 text-sm text-zinc-500">
 
-              <span>Version 1.0.0</span>
+              <span>
+                Version 1.0.0
+              </span>
 
-              <span>API Connected</span>
+              <span>
+                API Connected
+              </span>
 
               <span className="text-green-400">
                 ● Online
