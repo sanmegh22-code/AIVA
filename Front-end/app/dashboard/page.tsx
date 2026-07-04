@@ -38,6 +38,7 @@ export default function DashboardPage() {
     useState(true);
 
   const [summary, setSummary] =
+<<<<<<< Updated upstream
   useState({
     total_products: 0,
     total_categories: 0,
@@ -49,6 +50,16 @@ export default function DashboardPage() {
     healthy_inventory: 0,
     out_of_stock: 0,
   });
+=======
+    useState({
+      total_products: 0,
+      total_categories: 0,
+      total_warehouses: 0,
+      total_inventory: 0,
+      low_stock: 0,
+    });
+    console.log("Dashboard Version 5");
+>>>>>>> Stashed changes
 
   const [movements, setMovements] =
     useState<MovementItem[]>([]);
