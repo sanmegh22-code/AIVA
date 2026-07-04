@@ -17,7 +17,7 @@ import {
   Trash2,
 } from "lucide-react";
 
-import { getProducts } from "../services/product";
+import { deleteProduct, getProducts } from "../services/product";
 
 interface Product {
   id: number;
@@ -451,7 +451,7 @@ export default function ProductsPage() {
                           <div className="flex justify-center gap-3">
 
                             <Link
-                              href={`/products/${product.id}`}
+                              href={`/edit-product/${product.id}`}
                             >
 
                               <button className="flex h-10 w-10 items-center justify-center rounded-xl border border-zinc-700 bg-zinc-900 transition hover:border-white hover:bg-zinc-800">
@@ -464,18 +464,24 @@ export default function ProductsPage() {
 
                             <button
                               className="flex h-10 w-10 items-center justify-center rounded-xl border border-red-700 bg-red-500/10 text-red-400 transition hover:bg-red-600 hover:text-white"
-                              onClick={() => {
+                              onClick={async () => {
 
                                 if (
                                   confirm(
                                     `Delete "${product.name}"?`
                                   )
                                 ) {
-
-                                  alert(
-                                    "Delete API will be connected next."
-                                  );
-
+                                  try {
+                                    await deleteProduct(product.id);
+                                    setProducts((prev) =>
+                                      prev.filter(
+                                        (item) => item.id !== product.id
+                                      )
+                                    );
+                                  } catch (error) {
+                                    console.error(error);
+                                    alert("Failed to delete product.");
+                                  }
                                 }
 
                               }}

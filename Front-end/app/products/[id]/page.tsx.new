@@ -1,0 +1,126 @@
+"use client";
+
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+
+import { getProduct } from "../services/product";
+
+interface Product {
+  id: number;
+  name: string;
+  sku: string;
+  category: string;
+  price: number;
+  quantity?: number;
+  image_url?: string | null;
+}
+
+export default function ProductDetailsPage() {
+  const params = useParams<{ id: string }>();
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadProduct() {
+      try {
+        const data = await getProduct(Number(params.id));
+        setProduct(data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    if (params.id) {
+      loadProduct();
+    }
+  }, [params.id]);
+
+  if (loading) {
+    return <div className="min-h-screen bg-gray-50 p-8">Loading...</div>;
+  }
+
+  if (!product) {
+    return <div className="min-h-screen bg-gray-50 p-8">Product not found.</div>;
+  }
+
+  const stockStatus =
+    (product.quantity ?? 0) > 10
+      ? "In Stock"
+      : (product.quantity ?? 0) > 0
+        ? "Low Stock"
+        : "Out of Stock";
+
+  return (
+    <div className="min-h-screen bg-gray-50 p-8">
+      <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-md border p-8">
+
+        <div className="flex justify-between items-center mb-8">
+          <Link href="/products">
+            <button className="border px-4 py-2 rounded-lg">
+              ← Back
+            </button>
+          </Link>
+
+          <Link href={`/edit-product/${product.id}`}>
+            <button className="bg-black text-white px-5 py-2 rounded-lg">
+              Edit Product
+            </button>
+          </Link>
+        </div>
+
+        <h1 className="text-4xl font-bold mb-8">
+          {product.name}
+        </h1>
+
+        <div className="grid md:grid-cols-2 gap-10">
+
+          <div className="border rounded-xl h-96 flex items-center justify-center bg-gray-100 overflow-hidden">
+            {product.image_url ? (
+              <img
+                src={`http://127.0.0.1:8000/${product.image_url}`}
+                alt={product.name}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <span className="text-gray-500">No image available</span>
+            )}
+          </div>
+
+          <div className="space-y-4">
+
+            <p>
+              <strong>Name:</strong> {product.name}
+            </p>
+
+            <p>
+              <strong>SKU:</strong> {product.sku}
+            </p>
+
+            <p>
+              <strong>Category:</strong> {product.category}
+            </p>
+
+            <p>
+              <strong>Stock:</strong> {product.quantity ?? 0}
+            </p>
+
+            <p>
+              <strong>Price:</strong> ₹{product.price.toLocaleString()}
+            </p>
+
+            <p>
+              <strong>Status:</strong>
+              <span className="ml-2 bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
+                {stockStatus}
+              </span>
+            </p>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
