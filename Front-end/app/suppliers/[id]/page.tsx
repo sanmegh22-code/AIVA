@@ -1,101 +1,134 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 
+import { getSupplier, deleteSupplier } from "../../services/supplier";
+
 export default function SupplierDetailsPage() {
+  const router = useRouter();
+  const params = useParams();
+
+  const supplierId = Number(params.id);
+
+  const [supplier, setSupplier] = useState<any>(null);
+
+  useEffect(() => {
+    async function loadSupplier() {
+      try {
+        const data = await getSupplier(supplierId);
+        setSupplier(data);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    if (supplierId) {
+      loadSupplier();
+    }
+  }, [supplierId]);
+
+  async function handleDelete() {
+    if (!confirm("Delete this supplier?")) return;
+
+    try {
+      await deleteSupplier(supplierId);
+      alert("Supplier deleted successfully.");
+      router.push("/suppliers");
+    } catch (error) {
+      console.error(error);
+      alert("Failed to delete supplier.");
+    }
+  }
+
+  if (!supplier) {
+    return (
+      <div className="p-10">
+        Loading...
+      </div>
+    );
+  }
+
   return (
-    <div className="p-8">
-      <div className="max-w-5xl mx-auto bg-white border rounded-2xl shadow-sm p-8">
+    <div className="p-8 max-w-4xl mx-auto">
 
-        {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <Link href="/suppliers">
-            <button className="border px-4 py-2 rounded-lg hover:bg-gray-100">
-              ← Back
-            </button>
-          </Link>
+      <button
+        onClick={() => router.back()}
+        className="mb-6 border px-4 py-2 rounded-lg hover:bg-gray-100"
+      >
+        ← Back
+      </button>
 
-          <Link href="/edit-supplier">
-            <button className="bg-black text-white px-5 py-2 rounded-lg hover:bg-gray-800">
-              Edit Supplier
-            </button>
-          </Link>
-        </div>
+      <div className="bg-white border rounded-2xl shadow-sm p-8">
 
-        <h1 className="text-4xl font-bold mb-10">
+        <h1 className="text-4xl font-bold mb-8">
           Supplier Details
         </h1>
 
-        <div className="grid md:grid-cols-2 gap-8">
+        <div className="grid md:grid-cols-2 gap-6">
 
-          <div className="space-y-6">
-            <div>
-              <p className="text-gray-500">Supplier Name</p>
-              <h2 className="text-2xl font-semibold">
-                ABC Electronics
-              </h2>
-            </div>
-
-            <div>
-              <p className="text-gray-500">Contact Number</p>
-              <p className="text-lg">
-                9876543210
-              </p>
-            </div>
-
-            <div>
-              <p className="text-gray-500">Email Address</p>
-              <p className="text-lg">
-                abc@gmail.com
-              </p>
-            </div>
-
-            <div>
-              <p className="text-gray-500">Address</p>
-              <p className="text-lg">
-                Mumbai, Maharashtra, India
-              </p>
-            </div>
+          <div>
+            <p className="text-gray-500">Name</p>
+            <p className="font-semibold">{supplier.name}</p>
           </div>
 
-          <div className="space-y-6">
-            <div>
-              <p className="text-gray-500">Status</p>
-
-              <span className="px-4 py-2 rounded-full bg-green-100 text-green-700">
-                Active
-              </span>
-            </div>
-
-            <div>
-              <p className="text-gray-500">Products Supplied</p>
-
-              <ul className="list-disc ml-6 space-y-1">
-                <li>Laptop</li>
-                <li>Monitor</li>
-                <li>Keyboard</li>
-                <li>Mouse</li>
-              </ul>
-            </div>
-
-            <div>
-              <p className="text-gray-500">Last Order Date</p>
-
-              <p className="text-lg">
-                20 June 2026
-              </p>
-            </div>
-
-            <div>
-              <p className="text-gray-500">Total Products Supplied</p>
-
-              <p className="text-3xl font-bold">
-                125
-              </p>
-            </div>
+          <div>
+            <p className="text-gray-500">Email</p>
+            <p>{supplier.email}</p>
           </div>
+
+          <div>
+            <p className="text-gray-500">Phone</p>
+            <p>{supplier.phone}</p>
+          </div>
+
+          <div>
+            <p className="text-gray-500">GST Number</p>
+            <p>{supplier.gst_number || "-"}</p>
+          </div>
+
+          <div>
+            <p className="text-gray-500">City</p>
+            <p>{supplier.city || "-"}</p>
+          </div>
+
+          <div>
+            <p className="text-gray-500">State</p>
+            <p>{supplier.state || "-"}</p>
+          </div>
+
+        </div>
+
+        <div className="mt-8">
+          <p className="text-gray-500 mb-2">
+            Address
+          </p>
+
+          <div className="border rounded-lg p-4">
+            {supplier.address || "-"}
+          </div>
+        </div>
+
+        <div className="flex gap-4 mt-8">
+
+          <Link href={`/edit-supplier/${supplier.id}`}>
+            <button className="bg-black text-white px-6 py-3 rounded-lg">
+              Edit
+            </button>
+          </Link>
+
+          <button
+            onClick={handleDelete}
+            className="bg-red-600 text-white px-6 py-3 rounded-lg"
+          >
+            Delete
+          </button>
 
         </div>
 
       </div>
+
     </div>
   );
 }

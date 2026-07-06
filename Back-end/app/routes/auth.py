@@ -1,21 +1,25 @@
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 
-from app.db.database import get_db
-from app.db.models import User
-from app.schemas.user import UserRegister, UserLogin
+from app.core.logger import logger
 from app.core.security import (
+    create_access_token,
     hash_password,
     verify_password,
-    create_access_token
+    verify_token,
 )
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from app.core.security import verify_token
+from app.db.database import get_db
+from app.db.models import User
+from app.schemas.user import UserLogin, UserRegister
+
 router = APIRouter(
     prefix="/auth",
     tags=["Authentication"]
 )
+
 security = HTTPBearer()
+
 
 @router.post("/register")
 def register(
@@ -28,6 +32,10 @@ def register(
     ).first()
 
     if existing_user:
+        logger.warning(
+            f"Registration failed - Email already exists: {user.email}"
+        )
+
         raise HTTPException(
             status_code=400,
             detail="Email already exists"
@@ -44,9 +52,14 @@ def register(
     db.add(new_user)
     db.commit()
 
+    logger.info(
+        f"New user registered: {user.email}"
+    )
+
     return {
         "message": "User registered"
     }
+
 
 @router.post("/login")
 def login(
@@ -59,6 +72,11 @@ def login(
     ).first()
 
     if not db_user:
+
+        logger.warning(
+            f"Login failed - User not found: {user.email}"
+        )
+
         raise HTTPException(
             status_code=401,
             detail="Invalid credentials"
@@ -68,6 +86,11 @@ def login(
         user.password,
         db_user.hashed_password
     ):
+
+        logger.warning(
+            f"Login failed - Wrong password: {user.email}"
+        )
+
         raise HTTPException(
             status_code=401,
             detail="Invalid credentials"
@@ -77,10 +100,15 @@ def login(
         {"sub": db_user.email}
     )
 
+    logger.info(
+        f"User logged in: {db_user.email}"
+    )
+
     return {
         "access_token": token,
         "token_type": "bearer"
     }
+
 
 @router.get("/me")
 def get_current_user(
@@ -97,10 +125,19 @@ def get_current_user(
     ).first()
 
     if not user:
+
+        logger.warning(
+            f"Profile not found: {email}"
+        )
+
         raise HTTPException(
             status_code=404,
             detail="User not found"
         )
+
+    logger.info(
+        f"Profile accessed: {user.email}"
+    )
 
     return {
         "id": user.id,

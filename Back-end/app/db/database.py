@@ -1,13 +1,9 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
-from dotenv import load_dotenv
-import os
+from sqlalchemy import create_engine, inspect, text
+from sqlalchemy.orm import declarative_base, sessionmaker
 
-load_dotenv()
+from app.core.config import settings
 
-DATABASE_URL = os.getenv("DATABASE_URL")
-
-engine = create_engine(DATABASE_URL)
+engine = create_engine(settings.DATABASE_URL)
 
 SessionLocal = sessionmaker(
     autocommit=False,
@@ -17,9 +13,29 @@ SessionLocal = sessionmaker(
 
 Base = declarative_base()
 
+
+def ensure_schema():
+    inspector = inspect(engine)
+    tables = inspector.get_table_names()
+
+    if "products" in tables:
+        columns = {column["name"] for column in inspector.get_columns("products")}
+
+        if "quantity" not in columns:
+            with engine.begin() as connection:
+                connection.execute(
+                    text("ALTER TABLE products ADD COLUMN quantity INTEGER NOT NULL DEFAULT 0")
+                )
+
+
+ensure_schema()
+
+
 def get_db():
     db = SessionLocal()
+
     try:
         yield db
+
     finally:
         db.close()
