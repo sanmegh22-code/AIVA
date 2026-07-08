@@ -6,6 +6,7 @@ class ReportSummary(BaseModel):
     total_categories: int
     total_suppliers: int
     total_warehouses: int
+
     total_inventory: int
 
     inventory_value: float
@@ -13,4 +14,10 @@ class ReportSummary(BaseModel):
     low_stock: int
     out_of_stock: int
 
-    monthly_growth: float
+    average_inventory_value: float
+
+    average_quantity: float
+
+    stock_health: float
+
+    warehouse_utilization: float
