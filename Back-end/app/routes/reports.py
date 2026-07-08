@@ -6,7 +6,7 @@ from app.db.database import get_db
 from app.db.models import User
 
 from app.schemas.report import ReportSummary
-from app.services.report_service import ReportService
+from app.services.reports.report_service import ReportService
 
 router = APIRouter(
     prefix="/reports",
