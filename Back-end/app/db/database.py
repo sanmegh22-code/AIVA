@@ -27,6 +27,18 @@ def ensure_schema():
                     text("ALTER TABLE products ADD COLUMN quantity INTEGER NOT NULL DEFAULT 0")
                 )
 
+        if "created_at" not in columns:
+            with engine.begin() as connection:
+                connection.execute(
+                    text("ALTER TABLE products ADD COLUMN created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP")
+                )
+
+        if "updated_at" not in columns:
+            with engine.begin() as connection:
+                connection.execute(
+                    text("ALTER TABLE products ADD COLUMN updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP")
+                )
+
 
 ensure_schema()
 

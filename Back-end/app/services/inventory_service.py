@@ -2,50 +2,56 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session, joinedload
 
 from app.core.logger import logger
-from app.db.models import Inventory, Product, Warehouse
+from app.db.models import (
+    Inventory,
+    Product,
+    Warehouse,
+)
+from app.services.audit.audit_service import AuditService
+from app.services.notifications.notification_service import (
+    NotificationService,
+)
 
 
 class InventoryService:
 
+    # =====================================================
+    # CREATE INVENTORY
+    # =====================================================
+
     @staticmethod
-    def create_inventory(db: Session, data, current_user):
-
-        print("=" * 60)
-        print("Requested Product ID:", data.product_id)
-        print("Requested Warehouse ID:", data.warehouse_id)
-
-        print("\nProducts in Database:")
-        for p in db.query(Product).all():
-            print(f"ID={p.id}  Name={p.name}")
-
-        print("\nWarehouses in Database:")
-        for w in db.query(Warehouse).all():
-            print(f"ID={w.id}  Name={w.name}")
-
-        print("=" * 60)
+    def create_inventory(
+        db: Session,
+        data,
+        current_user,
+    ):
 
         product = (
             db.query(Product)
-            .filter(Product.id == data.product_id)
+            .filter(
+                Product.id == data.product_id
+            )
             .first()
         )
 
-        if not product:
+        if product is None:
             raise HTTPException(
                 status_code=404,
-                detail="Product not found"
+                detail="Product not found",
             )
 
         warehouse = (
             db.query(Warehouse)
-            .filter(Warehouse.id == data.warehouse_id)
+            .filter(
+                Warehouse.id == data.warehouse_id
+            )
             .first()
         )
 
-        if not warehouse:
+        if warehouse is None:
             raise HTTPException(
                 status_code=404,
-                detail="Warehouse not found"
+                detail="Warehouse not found",
             )
 
         existing = (
@@ -60,13 +66,13 @@ class InventoryService:
         if existing:
             raise HTTPException(
                 status_code=400,
-                detail="Inventory already exists for this warehouse"
+                detail="Inventory already exists for this warehouse",
             )
 
         if data.minimum_stock > data.maximum_stock:
             raise HTTPException(
                 status_code=400,
-                detail="Minimum stock cannot be greater than maximum stock"
+                detail="Minimum stock cannot exceed maximum stock",
             )
 
         inventory = Inventory(
@@ -78,30 +84,102 @@ class InventoryService:
         )
 
         db.add(inventory)
+
         db.commit()
+
         db.refresh(inventory)
+
+        AuditService.log(
+            db=db,
+            user_id=current_user.id,
+            action="CREATE",
+            module="Inventory",
+            description=(
+                f"Created inventory for "
+                f"{product.name} in "
+                f"{warehouse.name}"
+            ),
+        )
+
+        NotificationService.create_notification(
+            db=db,
+            user_id=current_user.id,
+            title="Inventory Created",
+            message=(
+                f"Inventory created for "
+                f"{product.name}"
+            ),
+            notification_type="success",
+            priority="normal",
+        )
 
         logger.info(
             f"{current_user.email} created inventory "
-            f"for Product {data.product_id} "
-            f"in Warehouse {data.warehouse_id}"
+            f"{inventory.id}"
         )
 
         return inventory
+    # =====================================================
+    # GET ALL INVENTORY
+    # =====================================================
 
     @staticmethod
-    def get_all_inventory(db: Session):
+    def get_all_inventory(
+        db: Session,
+        search: str = None,
+        warehouse_id: int = None,
+        product_id: int = None,
+        low_stock: bool = False,
+        page: int = 1,
+        limit: int = 10,
+    ):
 
-        inventories = (
+        query = (
             db.query(Inventory)
             .options(
                 joinedload(Inventory.product),
                 joinedload(Inventory.warehouse),
             )
+        )
+
+        if search:
+
+            query = query.filter(
+                Product.name.ilike(f"%{search}%")
+            ).join(Product)
+
+        if warehouse_id:
+
+            query = query.filter(
+                Inventory.warehouse_id == warehouse_id
+            )
+
+        if product_id:
+
+            query = query.filter(
+                Inventory.product_id == product_id
+            )
+
+        if low_stock:
+
+            query = query.filter(
+                Inventory.quantity <= Inventory.minimum_stock
+            )
+
+        offset = (page - 1) * limit
+
+        inventories = (
+            query
+            .offset(offset)
+            .limit(limit)
             .all()
         )
 
         return inventories
+
+    # =====================================================
+    # GET INVENTORY BY ID
+    # =====================================================
 
     @staticmethod
     def get_inventory(
@@ -121,13 +199,17 @@ class InventoryService:
             .first()
         )
 
-        if not inventory:
+        if inventory is None:
+
             raise HTTPException(
                 status_code=404,
-                detail="Inventory not found"
+                detail="Inventory not found",
             )
 
         return inventory
+    # =====================================================
+    # UPDATE INVENTORY
+    # =====================================================
 
     @staticmethod
     def update_inventory(
@@ -138,26 +220,33 @@ class InventoryService:
     ):
 
         inventory = InventoryService.get_inventory(
-            db,
-            inventory_id,
+            db=db,
+            inventory_id=inventory_id,
         )
 
         update_data = data.model_dump(
             exclude_unset=True
         )
 
-        if (
-            "minimum_stock" in update_data
-            and "maximum_stock" in update_data
-            and update_data["minimum_stock"]
-            > update_data["maximum_stock"]
-        ):
+        minimum_stock = update_data.get(
+            "minimum_stock",
+            inventory.minimum_stock,
+        )
+
+        maximum_stock = update_data.get(
+            "maximum_stock",
+            inventory.maximum_stock,
+        )
+
+        if minimum_stock > maximum_stock:
+
             raise HTTPException(
                 status_code=400,
-                detail="Minimum stock cannot be greater than maximum stock"
+                detail="Minimum stock cannot exceed maximum stock",
             )
 
         for key, value in update_data.items():
+
             setattr(
                 inventory,
                 key,
@@ -165,13 +254,43 @@ class InventoryService:
             )
 
         db.commit()
+
         db.refresh(inventory)
 
+        AuditService.log(
+            db=db,
+            user_id=current_user.id,
+            action="UPDATE",
+            module="Inventory",
+            description=(
+                f"Updated inventory "
+                f"#{inventory.id}"
+            ),
+        )
+
+        NotificationService.create_notification(
+            db=db,
+            user_id=current_user.id,
+            title="Inventory Updated",
+            message=(
+                f"Inventory "
+                f"#{inventory.id} updated successfully."
+            ),
+            notification_type="info",
+            priority="normal",
+        )
+
         logger.info(
-            f"{current_user.email} updated inventory {inventory.id}"
+            f"{current_user.email} updated "
+            f"inventory {inventory.id}"
         )
 
         return inventory
+
+
+    # =====================================================
+    # DELETE INVENTORY
+    # =====================================================
 
     @staticmethod
     def delete_inventory(
@@ -181,24 +300,198 @@ class InventoryService:
     ):
 
         inventory = InventoryService.get_inventory(
-            db,
-            inventory_id,
+            db=db,
+            inventory_id=inventory_id,
         )
 
         if inventory.quantity > 0:
+
             raise HTTPException(
                 status_code=400,
-                detail="Cannot delete inventory with stock available"
+                detail=(
+                    "Cannot delete inventory "
+                    "with available stock"
+                ),
             )
 
         db.delete(inventory)
+
         db.commit()
 
+        AuditService.log(
+            db=db,
+            user_id=current_user.id,
+            action="DELETE",
+            module="Inventory",
+            description=(
+                f"Deleted inventory "
+                f"#{inventory.id}"
+            ),
+        )
+
+        NotificationService.create_notification(
+            db=db,
+            user_id=current_user.id,
+            title="Inventory Deleted",
+            message=(
+                f"Inventory "
+                f"#{inventory.id} deleted successfully."
+            ),
+            notification_type="warning",
+            priority="high",
+        )
+
         logger.info(
-            f"{current_user.email} deleted inventory {inventory.id}"
+            f"{current_user.email} deleted "
+            f"inventory {inventory.id}"
         )
 
         return {
             "success": True,
             "message": "Inventory deleted successfully",
         }
+    # =====================================================
+    # INVENTORY STATISTICS
+    # =====================================================
+
+    @staticmethod
+    def get_inventory_statistics(
+        db: Session,
+    ):
+
+        inventories = db.query(Inventory).all()
+
+        total_inventory = len(inventories)
+
+        total_quantity = sum(
+            item.quantity
+            for item in inventories
+        )
+
+        low_stock_items = len(
+            [
+                item
+                for item in inventories
+                if item.quantity <= item.minimum_stock
+            ]
+        )
+
+        out_of_stock = len(
+            [
+                item
+                for item in inventories
+                if item.quantity == 0
+            ]
+        )
+
+        average_quantity = (
+            total_quantity / total_inventory
+            if total_inventory
+            else 0
+        )
+
+        return {
+            "total_inventory_records": total_inventory,
+            "total_quantity": total_quantity,
+            "average_quantity": round(
+                average_quantity,
+                2,
+            ),
+            "low_stock_items": low_stock_items,
+            "out_of_stock_items": out_of_stock,
+        }
+
+    # =====================================================
+    # INVENTORY BY WAREHOUSE
+    # =====================================================
+
+    @staticmethod
+    def get_inventory_by_warehouse(
+        db: Session,
+        warehouse_id: int,
+    ):
+
+        warehouse = (
+            db.query(Warehouse)
+            .filter(
+                Warehouse.id == warehouse_id
+            )
+            .first()
+        )
+
+        if warehouse is None:
+
+            raise HTTPException(
+                status_code=404,
+                detail="Warehouse not found",
+            )
+
+        return (
+            db.query(Inventory)
+            .options(
+                joinedload(Inventory.product),
+                joinedload(Inventory.warehouse),
+            )
+            .filter(
+                Inventory.warehouse_id == warehouse_id
+            )
+            .all()
+        )
+
+    # =====================================================
+    # INVENTORY BY PRODUCT
+    # =====================================================
+
+    @staticmethod
+    def get_inventory_by_product(
+        db: Session,
+        product_id: int,
+    ):
+
+        product = (
+            db.query(Product)
+            .filter(
+                Product.id == product_id
+            )
+            .first()
+        )
+
+        if product is None:
+
+            raise HTTPException(
+                status_code=404,
+                detail="Product not found",
+            )
+
+        return (
+            db.query(Inventory)
+            .options(
+                joinedload(Inventory.product),
+                joinedload(Inventory.warehouse),
+            )
+            .filter(
+                Inventory.product_id == product_id
+            )
+            .all()
+        )
+
+    # =====================================================
+    # LOW STOCK INVENTORY
+    # =====================================================
+
+    @staticmethod
+    def get_low_stock_inventory(
+        db: Session,
+    ):
+
+        return (
+            db.query(Inventory)
+            .options(
+                joinedload(Inventory.product),
+                joinedload(Inventory.warehouse),
+            )
+            .filter(
+                Inventory.quantity <= Inventory.minimum_stock
+            )
+            .all()
+        )

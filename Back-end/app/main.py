@@ -14,6 +14,9 @@ from app.db.models import (
 from app.routes.dashboard import (
     router as dashboard_router,
 )
+from app.routes.notifications import (
+    router as notification_router,
+)
 from app.routes.reports import router as reports_router
 from app.routes.auth import router as auth_router
 from app.routes.products import router as product_router
@@ -24,8 +27,11 @@ from app.routes.inventory import router as inventory_router
 from app.routes.product_images import router as product_image_router
 from app.routes.stock import router as stock_router
 from app.routes import suppliers
+from app.routes.audit import router as audit_router
 
 from app.exceptions.handlers import register_exception_handlers
+from app.routes.search import router as search_router
+from app.routes.ai import router as ai_router
 
 # Create all database tables
 Base.metadata.create_all(bind=engine)
@@ -71,6 +77,10 @@ app.include_router(stock_router)
 app.include_router(dashboard_router)
 app.include_router(suppliers.router)
 app.include_router(reports_router)
+app.include_router(notification_router)
+app.include_router(audit_router)
+app.include_router(search_router)
+app.include_router(ai_router)
 # -------------------------
 # Default Routes
 # -------------------------
