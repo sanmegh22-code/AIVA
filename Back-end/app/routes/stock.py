@@ -21,6 +21,10 @@ router = APIRouter(
 )
 
 
+# =====================================================
+# STOCK IN
+# =====================================================
+
 @router.post("/in")
 def stock_in(
     stock: StockIn,
@@ -36,6 +40,10 @@ def stock_in(
     )
 
 
+# =====================================================
+# STOCK OUT
+# =====================================================
+
 @router.post("/out")
 def stock_out(
     stock: StockOut,
@@ -49,6 +57,12 @@ def stock_out(
         data=stock,
         current_user=current_user,
     )
+
+
+# =====================================================
+# STOCK TRANSFER
+# =====================================================
+
 @router.post("/transfer")
 def stock_transfer(
     stock: StockTransfer,
@@ -64,6 +78,10 @@ def stock_transfer(
     )
 
 
+# =====================================================
+# STOCK ADJUSTMENT
+# =====================================================
+
 @router.post("/adjust")
 def stock_adjustment(
     stock: StockAdjustment,
@@ -77,9 +95,77 @@ def stock_adjustment(
         data=stock,
         current_user=current_user,
     )
+
+
+# =====================================================
+# STOCK HISTORY
+# =====================================================
+
 @router.get("/history")
 def get_stock_history(
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(
+        get_current_user
+    ),
 ):
     return StockService.get_stock_history(db)
+
+
+# =====================================================
+# LOW STOCK
+# =====================================================
+
+@router.get("/low-stock")
+def get_low_stock(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(
+        get_current_user
+    ),
+):
+    return StockService.get_low_stock(db)
+
+
+# =====================================================
+# INVENTORY SUMMARY
+# =====================================================
+
+@router.get("/summary")
+def get_inventory_summary(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(
+        get_current_user
+    ),
+):
+    return StockService.get_inventory_summary(db)
+
+
+# =====================================================
+# RECENT MOVEMENTS
+# =====================================================
+
+@router.get("/recent")
+def get_recent_movements(
+    limit: int = 10,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(
+        get_current_user
+    ),
+):
+    return StockService.get_recent_movements(
+        db=db,
+        limit=limit,
+    )
+
+
+# =====================================================
+# STOCK STATISTICS
+# =====================================================
+
+@router.get("/statistics")
+def get_stock_statistics(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(
+        get_current_user
+    ),
+):
+    return StockService.get_stock_statistics(db)

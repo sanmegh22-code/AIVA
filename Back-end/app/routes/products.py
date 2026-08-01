@@ -1,63 +1,57 @@
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import or_
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from app.core.dependencies import get_current_user, require_roles
-from app.core.logger import logger
+from app.core.dependencies import (
+    get_current_user,
+    require_roles,
+)
 from app.db.database import get_db
-from app.db.models import Product, User
-from app.schemas.product import ProductCreate, ProductUpdate
+from app.db.models import User
+from app.schemas.product import (
+    ProductCreate,
+    ProductResponse,
+    ProductUpdate,
+)
+from app.services.product_service import ProductService
 
 router = APIRouter(
     prefix="/products",
-    tags=["Products"]
+    tags=["Products"],
 )
 
 
-@router.post("/")
+# =====================================================
+# CREATE PRODUCT
+# =====================================================
+
+@router.post(
+    "/",
+    response_model=ProductResponse,
+)
 def create_product(
     product: ProductCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_roles("admin", "manager"))
+    current_user: User = Depends(
+        require_roles("admin", "manager")
+    ),
 ):
-
-    existing = db.query(Product).filter(
-        Product.sku == product.sku
-    ).first()
-
-    if existing:
-
-        logger.warning(
-            f"{current_user.email} tried to create duplicate SKU: {product.sku}"
-        )
-
-        raise HTTPException(
-            status_code=400,
-            detail="SKU already exists"
-        )
-
-    new_product = Product(
-        name=product.name,
-        sku=product.sku,
-        price=product.price,
-        category=product.category,
-        quantity=product.quantity,
+    return ProductService.create_product(
+        db=db,
+        data=product,
+        current_user=current_user,
     )
 
-    db.add(new_product)
-    db.commit()
-    db.refresh(new_product)
 
-    logger.info(
-        f"{current_user.email} created product {new_product.sku}"
-    )
+# =====================================================
+# GET ALL PRODUCTS
+# =====================================================
 
-    return new_product
-
-
-@router.get("/")
+@router.get(
+    "/",
+    response_model=list[ProductResponse],
+)
 def get_products(
     search: Optional[str] = None,
     category: Optional[str] = None,
@@ -66,168 +60,122 @@ def get_products(
     limit: int = 10,
     sort: str = "id",
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(
+        get_current_user
+    ),
 ):
-
-    query = db.query(Product)
-
-    # Search
-    if search:
-        query = query.filter(
-            or_(
-                Product.name.ilike(f"%{search}%"),
-                Product.sku.ilike(f"%{search}%")
-            )
-        )
-
-    # Category Filter
-    if category:
-        query = query.filter(
-            Product.category.ilike(category)
-        )
-
-    # Computed Status Filter
-    if status:
-
-        status = status.lower()
-
-        if status == "available":
-            query = query.filter(Product.quantity > 0)
-
-        elif status in (
-            "outofstock",
-            "out_of_stock",
-            "out-of-stock"
-        ):
-            query = query.filter(Product.quantity == 0)
-
-    # Sorting
-    if sort == "name":
-        query = query.order_by(Product.name)
-
-    elif sort == "price":
-        query = query.order_by(Product.price)
-
-    else:
-        query = query.order_by(Product.id)
-
-    # Pagination
-    offset = (page - 1) * limit
-
-    products = query.offset(offset).limit(limit).all()
-
-    logger.info(
-        f"{current_user.email} viewed product list"
+    return ProductService.get_products(
+        db=db,
+        search=search,
+        category=category,
+        status=status,
+        page=page,
+        limit=limit,
+        sort=sort,
     )
 
-    return products
 
+# =====================================================
+# GET PRODUCT
+# =====================================================
 
-@router.get("/{product_id}")
+@router.get(
+    "/{product_id}",
+    response_model=ProductResponse,
+)
 def get_product(
     product_id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(
+        get_current_user
+    ),
 ):
-
-    product = db.query(Product).filter(
-        Product.id == product_id
-    ).first()
-
-    if not product:
-
-        logger.warning(
-            f"{current_user.email} requested non-existing product {product_id}"
-        )
-
-        raise HTTPException(
-            status_code=404,
-            detail="Product not found"
-        )
-
-    logger.info(
-        f"{current_user.email} viewed product {product.sku}"
+    return ProductService.get_product(
+        db=db,
+        product_id=product_id,
     )
 
-    return product
 
+# =====================================================
+# UPDATE PRODUCT
+# =====================================================
 
-@router.put("/{product_id}")
+@router.put(
+    "/{product_id}",
+    response_model=ProductResponse,
+)
 def update_product(
     product_id: int,
-    updated_product: ProductUpdate,
+    product: ProductUpdate,
     db: Session = Depends(get_db),
     current_user: User = Depends(
         require_roles("admin", "manager")
-    )
+    ),
 ):
-
-    product = db.query(Product).filter(
-        Product.id == product_id
-    ).first()
-
-    if not product:
-        raise HTTPException(
-            status_code=404,
-            detail="Product not found"
-        )
-
-    if updated_product.sku:
-
-        existing = db.query(Product).filter(
-            Product.sku == updated_product.sku,
-            Product.id != product_id
-        ).first()
-
-        if existing:
-            raise HTTPException(
-                status_code=400,
-                detail="SKU already exists"
-            )
-
-    update_data = updated_product.model_dump(
-        exclude_unset=True
+    return ProductService.update_product(
+        db=db,
+        product_id=product_id,
+        data=product,
+        current_user=current_user,
     )
 
-    for key, value in update_data.items():
-        setattr(product, key, value)
 
-    db.commit()
-    db.refresh(product)
-
-    logger.info(
-        f"{current_user.email} updated product {product.sku}"
-    )
-
-    return product
-
+# =====================================================
+# DELETE PRODUCT
+# =====================================================
 
 @router.delete("/{product_id}")
 def delete_product(
     product_id: int,
     db: Session = Depends(get_db),
     current_user: User = Depends(
-        require_roles("admin", "manager")
-    )
+        require_roles("admin")
+    ),
 ):
-
-    product = db.query(Product).filter(
-        Product.id == product_id
-    ).first()
-
-    if not product:
-        raise HTTPException(
-            status_code=404,
-            detail="Product not found"
-        )
-
-    logger.info(
-        f"{current_user.email} deleted product {product.sku}"
+    return ProductService.delete_product(
+        db=db,
+        product_id=product_id,
+        current_user=current_user,
     )
 
-    db.delete(product)
-    db.commit()
 
-    return {
-        "message": "Product deleted successfully"
-    }
+# =====================================================
+# LOW STOCK PRODUCTS
+# =====================================================
+
+@router.get("/low-stock")
+def get_low_stock_products(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(
+        get_current_user
+    ),
+):
+    return ProductService.get_low_stock_products(db)
+
+
+# =====================================================
+# PRODUCT STATISTICS
+# =====================================================
+
+@router.get("/statistics")
+def get_product_statistics(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(
+        get_current_user
+    ),
+):
+    return ProductService.get_product_statistics(db)
+
+
+# =====================================================
+# PRODUCT DASHBOARD
+# =====================================================
+
+@router.get("/dashboard")
+def get_dashboard_summary(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(
+        get_current_user
+    ),
+):
+    return ProductService.get_dashboard_summary(db)

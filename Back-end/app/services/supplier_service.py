@@ -3,12 +3,17 @@ from sqlalchemy.orm import Session
 
 from app.core.logger import logger
 from app.db.models import Supplier
+from app.services.audit.audit_service import AuditService
 
 
 class SupplierService:
 
     @staticmethod
-    def create_supplier(db: Session, data, current_user):
+    def create_supplier(
+        db: Session,
+        data,
+        current_user,
+    ):
 
         existing = (
             db.query(Supplier)
@@ -19,7 +24,7 @@ class SupplierService:
         if existing:
             raise HTTPException(
                 status_code=400,
-                detail="Supplier already exists"
+                detail="Supplier already exists",
             )
 
         supplier = Supplier(
@@ -33,8 +38,18 @@ class SupplierService:
         )
 
         db.add(supplier)
+
         db.commit()
+
         db.refresh(supplier)
+
+        AuditService.log(
+            db=db,
+            user_id=current_user.id,
+            action="CREATE",
+            module="Suppliers",
+            description=f"Created supplier '{supplier.name}'",
+        )
 
         logger.info(
             f"{current_user.email} created supplier {supplier.name}"
@@ -43,11 +58,17 @@ class SupplierService:
         return supplier
 
     @staticmethod
-    def get_all_suppliers(db: Session):
+    def get_all_suppliers(
+        db: Session,
+    ):
+
         return db.query(Supplier).all()
 
     @staticmethod
-    def get_supplier(db: Session, supplier_id: int):
+    def get_supplier(
+        db: Session,
+        supplier_id: int,
+    ):
 
         supplier = (
             db.query(Supplier)
@@ -58,7 +79,7 @@ class SupplierService:
         if not supplier:
             raise HTTPException(
                 status_code=404,
-                detail="Supplier not found"
+                detail="Supplier not found",
             )
 
         return supplier
@@ -68,12 +89,12 @@ class SupplierService:
         db: Session,
         supplier_id: int,
         data,
-        current_user
+        current_user,
     ):
 
         supplier = SupplierService.get_supplier(
             db,
-            supplier_id
+            supplier_id,
         )
 
         update_data = data.model_dump(
@@ -81,10 +102,23 @@ class SupplierService:
         )
 
         for key, value in update_data.items():
-            setattr(supplier, key, value)
+            setattr(
+                supplier,
+                key,
+                value,
+            )
 
         db.commit()
+
         db.refresh(supplier)
+
+        AuditService.log(
+            db=db,
+            user_id=current_user.id,
+            action="UPDATE",
+            module="Suppliers",
+            description=f"Updated supplier '{supplier.name}'",
+        )
 
         logger.info(
             f"{current_user.email} updated supplier {supplier.id}"
@@ -96,15 +130,24 @@ class SupplierService:
     def delete_supplier(
         db: Session,
         supplier_id: int,
-        current_user
+        current_user,
     ):
 
         supplier = SupplierService.get_supplier(
             db,
-            supplier_id
+            supplier_id,
+        )
+
+        AuditService.log(
+            db=db,
+            user_id=current_user.id,
+            action="DELETE",
+            module="Suppliers",
+            description=f"Deleted supplier '{supplier.name}'",
         )
 
         db.delete(supplier)
+
         db.commit()
 
         logger.info(
@@ -113,5 +156,5 @@ class SupplierService:
 
         return {
             "success": True,
-            "message": "Supplier deleted successfully"
+            "message": "Supplier deleted successfully",
         }

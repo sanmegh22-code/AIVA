@@ -13,6 +13,7 @@ from app.schemas.supplier import (
 )
 from app.services.supplier_service import SupplierService
 
+
 router = APIRouter(
     prefix="/suppliers",
     tags=["Suppliers"],
