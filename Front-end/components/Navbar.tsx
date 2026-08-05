@@ -2,6 +2,7 @@
 
 import { Bell, ChevronDown, LogOut, Settings, User } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import {
   getRecentNotifications,
   getUnreadCount,
@@ -180,3 +181,4 @@ const handleNotificationClick = async (notification: Notification) => {
     </header>
   );
 }
+
