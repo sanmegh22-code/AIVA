@@ -6,7 +6,7 @@ import Link from "next/link";
 import Sidebar from "../../components/Sidebar";
 import Navbar from "../../components/Navbar";
 
-import Button from "../../components/ui/Button";
+import Button from "../../components/ui/button";
 import Skeleton from "../../components/ui/Skeleton";
 
 import {

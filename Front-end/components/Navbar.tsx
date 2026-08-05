@@ -2,7 +2,12 @@
 
 import { Bell, ChevronDown, LogOut, Settings, User } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import {
+  getRecentNotifications,
+  getUnreadCount,
+  markNotificationRead,
+  type Notification,
+} from "../app/services/notifications";
 
 export default function Navbar() {
   const router = useRouter();
@@ -19,10 +24,46 @@ export default function Navbar() {
     return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
-  const notifications = [
-    { title: "Low stock alert", detail: "3 products need replenishment." },
-    { title: "Inventory updated", detail: "Warehouse B stock synced successfully." },
-  ];
+const [notifications, setNotifications] = useState<Notification[]>([]);
+const [unreadCount, setUnreadCount] = useState(0);
+
+useEffect(() => {
+  async function loadNotifications() {
+    try {
+      const [recent, count] = await Promise.all([
+        getRecentNotifications(),
+        getUnreadCount(),
+      ]);
+
+      setNotifications(recent);
+      setUnreadCount(count.unread);
+    } catch (error) {
+      console.error("Failed to load notifications:", error);
+    }
+  }
+
+  loadNotifications();
+}, []);
+
+const handleNotificationClick = async (notification: Notification) => {
+  if (notification.is_read) return;
+
+  try {
+    await markNotificationRead(notification.id);
+
+    setNotifications((current) =>
+      current.map((item) =>
+        item.id === notification.id
+          ? { ...item, is_read: true }
+          : item
+      )
+    );
+
+    setUnreadCount((count) => Math.max(0, count - 1));
+  } catch (error) {
+    console.error("Failed to mark notification as read:", error);
+  }
+};
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -48,21 +89,50 @@ export default function Navbar() {
               className="relative flex h-12 w-12 items-center justify-center rounded-2xl border border-zinc-700 bg-zinc-900 transition hover:border-white"
             >
               <Bell size={20} className="text-white" />
-              <span className="absolute right-3 top-3 h-2.5 w-2.5 rounded-full bg-red-500"></span>
+{unreadCount > 0 && (
+  <span className="absolute right-2 top-2 flex min-h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
+    {unreadCount > 99 ? "99+" : unreadCount}
+  </span>
+)}
             </button>
 
             {showNotifications && (
               <div className="absolute right-0 top-14 w-80 rounded-2xl border border-zinc-800 bg-zinc-950 p-3 shadow-xl">
                 <div className="mb-2 px-2 text-sm font-semibold text-white">Notifications</div>
-                <div className="space-y-2">
-                  {notifications.map((item, index) => (
-                    <div key={index} className="rounded-xl border border-zinc-800 bg-zinc-900 p-3">
-                      <p className="text-sm font-medium text-white">{item.title}</p>
-                      <p className="mt-1 text-sm text-zinc-500">{item.detail}</p>
-                    </div>
-                  ))}
+<div className="space-y-2">
+  {notifications.length === 0 ? (
+    <p className="px-2 py-4 text-sm text-zinc-500">
+      No notifications yet.
+    </p>
+  ) : (
+    notifications.map((item) => (
+      <button
+        key={item.id}
+        onClick={() => handleNotificationClick(item)}
+        className={`w-full rounded-xl border p-3 text-left transition ${
+          item.is_read
+            ? "border-zinc-800 bg-zinc-900"
+            : "border-zinc-700 bg-zinc-800"
+        }`}
+      >
+        <div className="flex items-start justify-between gap-3">
+          <p className="text-sm font-medium text-white">
+            {item.title}
+          </p>
+
+          {!item.is_read && (
+            <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-red-500" />
+          )}
+        </div>
+
+        <p className="mt-1 text-sm text-zinc-500">
+          {item.message}
+        </p>
+      </button>
+    ))
+  )}
+</div>
                 </div>
-              </div>
             )}
           </div>
 

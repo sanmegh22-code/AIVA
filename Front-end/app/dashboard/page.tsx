@@ -8,7 +8,7 @@ import Navbar from "../../components/Navbar";
 
 import StatCard from "../../components/StatCard";
 import Skeleton from "../../components/ui/Skeleton";
-import Button from "../../components/ui/Button";
+import Button from "../../components/ui/button";
 
 import {
   Package,
