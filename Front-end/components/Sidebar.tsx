@@ -10,6 +10,7 @@ import {
   Truck,
   BarChart3,
   Settings,
+  Sparkles,
 } from "lucide-react";
 
 const menuItems = [
@@ -37,6 +38,11 @@ const menuItems = [
     title: "Reports",
     href: "/reports",
     icon: BarChart3,
+  },
+  {
+    title: "AI Assistant",
+    href: "/ai",
+    icon: Sparkles,
   },
   {
     title: "Settings",

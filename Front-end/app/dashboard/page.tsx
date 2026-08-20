@@ -106,7 +106,7 @@ export default function DashboardPage() {
 
                 <h1 className="text-5xl font-black tracking-tight">
 
-                  Welcome Back 👋
+                  Welcome
 
                 </h1>
 
